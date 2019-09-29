@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>JMGBECore</AssemblyName>
+    <RootNamespace>JMGBE.Core</RootNamespace>
+    <Authors>Julien Russo</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="bootloader.bin">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
