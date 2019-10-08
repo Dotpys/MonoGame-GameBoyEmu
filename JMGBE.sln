@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29311.281
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMGBE", "JMGBE\JMGBE.csproj", "{5DA2FDC0-76AF-43C1-8713-8E418FDBDE69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JMGBE", "JMGBE\JMGBE.csproj", "{5DA2FDC0-76AF-43C1-8713-8E418FDBDE69}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMGBEDBG", "JMGBEDBG\JMGBEDBG.csproj", "{DC46384F-261D-4C2C-B3E1-7930EAD63081}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JMGBEDBG", "JMGBEDBG\JMGBEDBG.csproj", "{DC46384F-261D-4C2C-B3E1-7930EAD63081}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMGBEVDBG", "JMGBEVDBG\JMGBEVDBG.csproj", "{F7398564-2173-452A-B92C-58D83DA56F1A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{DC46384F-261D-4C2C-B3E1-7930EAD63081}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC46384F-261D-4C2C-B3E1-7930EAD63081}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC46384F-261D-4C2C-B3E1-7930EAD63081}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7398564-2173-452A-B92C-58D83DA56F1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7398564-2173-452A-B92C-58D83DA56F1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7398564-2173-452A-B92C-58D83DA56F1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7398564-2173-452A-B92C-58D83DA56F1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

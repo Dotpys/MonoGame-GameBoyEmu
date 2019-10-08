@@ -7,30 +7,47 @@ namespace JMGBE.Core
 {
 	public class Memory : MemoryBase<ushort>
 	{
+		private Memory<byte> memory;
+		private Memory<byte> cartridge;
+		private Memory<byte> video_ram;
 
-		public byte[] memory;
-		private const ushort BASE_CARTRIDGE_ADDR = 0x0000;
+		private const ushort CARTRIDGE_BASE_ADDR =	0x0000;
+		private const ushort CARTRIDGE_END_ADDR =	0x7fff;
+
+		private const ushort VIDEO_RAM_BASE_ADDR =	0x8000;
+		private const ushort VIDEO_RMA_END_ADDR =	0x9fff;
 
 		public Memory()
 		{
 			memory = new byte[65536];
-			File.ReadAllBytes("bootloader.bin").CopyTo(memory, BASE_CARTRIDGE_ADDR);
-			//File.ReadAllBytes(@"C:\Users\Julien\Desktop\tetris.gb").CopyTo(memory, BASE_CARTRIDGE_ADDR);
+			cartridge = memory[CARTRIDGE_BASE_ADDR..CARTRIDGE_END_ADDR];
+			video_ram = memory[VIDEO_RAM_BASE_ADDR..VIDEO_RMA_END_ADDR];
+			File.ReadAllBytes("bootloader.bin").CopyTo(cartridge);
 		}
 
 		public override byte ReadByte(ushort address)
 		{
-			return memory[address];
+			return memory.Span[address];
 		}
 
 		public override void WriteByte(ushort address, byte value)
 		{
-			memory[address] = value;
+			memory.Span[address] = value;
 			//Simuliamo la regione di memoria 'echo'.
 			if (address >= 0xE000 & address < 0xFE00)
-				memory[address - 0x2000] = value;
+				memory.Span[address - 0x2000] = value;
 			else if (address >= 0xC000 & address < 0xDE00)
-				memory[address + 0x2000] = value;
+				memory.Span[address + 0x2000] = value;
+		}
+
+		public override ushort ReadUshort(ushort address)
+		{
+			return BitConverter.ToUInt16(memory.Slice(address, 2).Span);
+		}
+
+		public override void WriteUshort(ushort address, ushort value)
+		{
+			BitConverter.GetBytes(value).CopyTo(memory.Slice(address, 2));
 		}
 	}
 }
