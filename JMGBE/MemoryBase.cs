@@ -14,7 +14,7 @@ namespace JMGBE.Core
 	{
 		public abstract void WriteByte(T address, byte value);
 		public abstract byte ReadByte(T address);
-		public abstract void WriteUshort(T address, ushort value);
-		public abstract ushort ReadUshort(T address);
+		public abstract void WriteUShort(T address, ushort value);
+		public abstract ushort ReadUShort(T address);
 	}
 }

@@ -1,18 +1,20 @@
 ﻿using JMGBE;
 using JMGBE.Core;
 using System;
+using System.Threading;
 
 namespace JMGBEDBG
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static void Main()
 		{
-			Console.WriteLine("Test GBA!\n");
-			CPU c = new CPU();
+			Memory m = new Memory();
+			CPU c = new CPU(m);
 			while (true)
 			{
-				c.Execute();
+				c.NextInstruction();
+				//Thread.Sleep(1);
 			}
 		}
 	}
