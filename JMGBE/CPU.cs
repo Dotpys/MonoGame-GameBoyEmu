@@ -6,7 +6,10 @@ namespace JMGBE.Core
 {
 	public class CPU
 	{
+
 		private FlagRegister registerF;
+		#region Properties
+		public bool IsRunning { get; set; }
 
 		public byte RegisterA { get; set; }
 		public byte RegisterB { get; set; }
@@ -81,7 +84,7 @@ namespace JMGBE.Core
 			get { return RegisterF.CheckBit(4); }
 			set { if (CarryFlag != value) RegisterF ^= 0x10; }
 		}
-
+		#endregion
 		private readonly MemoryBase<ushort> _memory;
 		private short pci = 0;
 
@@ -90,16 +93,17 @@ namespace JMGBE.Core
 			PC = 0x0000;
 			_memory = memory;
 #if DEBUG
-			Console.WriteLine("╔═══════════════════════════════════╦═════════════╦═════════════╦═════════════╦═════════════╦═════════════╦═════════════╦═════════════╦═════════════╦════╦════╦════╦════╦════╦════╗");
-			Console.WriteLine("║              Program              ║      A      ║      F      ║      B      ║      C      ║      D      ║      E      ║      H      ║      L      ║ AF ║ BC ║ DE ║ HL ║ PC ║ SP ║");
-			Console.WriteLine("╠═══════════════════════════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬════╬════╬════╬════╬════╬════╣");
-			Console.WriteLine("║                                   ║             ║FNHC         ║             ║             ║             ║             ║             ║             ║    ║    ║    ║    ║    ║    ║");
-			Console.WriteLine("╠═══════════════════════════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬════╬════╬════╬════╬════╬════╣");
+			Console.WriteLine(	"╔═══════════════════════════════════╦═════════════╦═════════════╦═════════════╦═════════════╦═════════════╦═════════════╦═════════════╦═════════════╦════╦════╦════╦════╦════╦════╗" +
+								"║              Mnemonic             ║      A      ║      F      ║      B      ║      C      ║      D      ║      E      ║      H      ║      L      ║ AF ║ BC ║ DE ║ HL ║ PC ║ SP ║" +
+								"╠═══════════════════════════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬════╬════╬════╬════╬════╬════╣" +
+								"║                                   ║             ║FNHC         ║             ║             ║             ║             ║             ║             ║    ║    ║    ║    ║    ║    ║" +
+								"╠═══════════════════════════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬═════════════╬════╬════╬════╬════╬════╬════╣");
 #endif
 		}
 
 		public void NextInstruction()
 		{
+			if (!IsRunning) return;
 			byte instruction = ReadByteOperand();
 #if DEBUG
 			if (PC == 0x0008) RegisterHL = 0x7fff;
@@ -235,7 +239,7 @@ namespace JMGBE.Core
 						throw new NotImplementedException("STOP not in the form $10 $00");
 					throw new NotImplementedException();
 					//DumpCPU("STOP");
-					break;
+					//break;
 				#endregion
 				#region 11 LD DE, nn
 				case 0x11:
@@ -409,6 +413,7 @@ namespace JMGBE.Core
 					DumpCPU($"LD H, {Hex2String(RegisterH)}");
 					break;
 				#endregion
+
 				#region 28 JR Z, n
 				case 0x28:
 					sbyte n28 = ReadSbyteOperand();
@@ -423,6 +428,11 @@ namespace JMGBE.Core
 					HalfCarryFlag = ((RegisterHL & 0b00001111_11111111) + (RegisterHL & 0b00001111_11111111)) > 0xFFF;
 					CarryFlag = (RegisterHL + RegisterHL) > 0xFFF;
 					RegisterHL += RegisterHL;
+					break;
+				#endregion
+				#region 2A LD A, (HL+)
+				case 0x2A:
+					RegisterA = _memory.ReadByte(RegisterHL++);
 					break;
 				#endregion
 				#region 2B DEC HL
@@ -456,6 +466,7 @@ namespace JMGBE.Core
 					DumpCPU($"LD L, {Hex2String(RegisterL)}");
 					break;
 				#endregion
+
 				#region 30 JR NC, n
 				case 0x30:
 					sbyte n30 = ReadSbyteOperand();
@@ -501,6 +512,13 @@ namespace JMGBE.Core
 					DumpCPU("DEC (HL)");
 					break;
 				#endregion
+				#region 36 LD (HL), n
+				case 0x36:
+					_memory.WriteByte(RegisterHL, ReadByteOperand());
+					DumpCPU($"LD (HL), {Hex2String(_memory.ReadByte(RegisterHL))}");
+					break;
+				#endregion
+
 				#region 38 JR C, n
 				case 0x38:
 					sbyte n38 = ReadSbyteOperand();
@@ -517,9 +535,14 @@ namespace JMGBE.Core
 					RegisterHL += SP;
 					break;
 				#endregion
+				#region 3A LD A, (HL-)
+				case 0x3A:
+					RegisterA = _memory.ReadByte(RegisterHL--);
+					break;
+				#endregion
 				#region 3B DEC SP
 				case 0x3B:
-					RegisterSP--;
+					SP--;
 					DumpCPU("DEC SP");
 					break;
 				#endregion
@@ -542,12 +565,13 @@ namespace JMGBE.Core
 					DumpCPU("DEC A");
 					break;
 				#endregion
-				#region 3E LD A, #
+				#region 3E LD A, n
 				case 0x3E:
 					RegisterA = ReadByteOperand();
 					DumpCPU($"LD A, {Hex2String(RegisterA)}");
 					break;
 				#endregion
+
 				#region 40 LD B, B
 				case 0x40:
 					DumpCPU("LD B, B");
@@ -584,19 +608,60 @@ namespace JMGBE.Core
 					break;
 				#endregion
 				#region 46 LD B, (HL)
-				case 0x46:  //LD B, (HL)
-					RegisterB = (byte)RegisterHL;
+				case 0x46:
+					RegisterB = _memory.ReadByte(RegisterHL);
 					DumpCPU("LD B, (HL)");
 					break;
 				#endregion
 				#region 47 LD B, A
-				case 0x47:  //LD B, A
+				case 0x47:
 					RegisterB = RegisterA;
 					DumpCPU($"LD B, A");
 					break;
 				#endregion
+				#region 48 LD C, B
+				case 0x48:
+					RegisterC = RegisterB;
+					DumpCPU("LD C, B");
+					break;
+				#endregion
+				#region 49 LD C, C
+				case 0x49:
+					DumpCPU("LD C, C");
+					break;
+				#endregion
+				#region 4A LD C, D
+				case 0x4A:
+					RegisterC = RegisterD;
+					DumpCPU("LD C, D");
+					break;
+				#endregion
+				#region 4B LD C, E
+				case 0x4B:
+					RegisterC = RegisterE;
+					DumpCPU("LD C, E");
+					break;
+				#endregion
+				#region 4C LD C, H
+				case 0x4C:
+					RegisterC = RegisterH;
+					DumpCPU("LD C, H");
+					break;
+				#endregion
+				#region 4D LD C, L
+				case 0x4D:
+					RegisterC = RegisterL;
+					DumpCPU("LD C, L");
+					break;
+				#endregion
+				#region 4E LD C, (HL)
+				case 0x4E:
+					RegisterC = _memory.ReadByte(RegisterHL);
+					DumpCPU("LD C, (HL)");
+					break;
+				#endregion
 				#region 4F LD C, A
-				case 0x4F:  //LD C, A
+				case 0x4F:
 					RegisterC = RegisterA;
 					DumpCPU($"LD C, A");
 					break;
@@ -636,60 +701,512 @@ namespace JMGBE.Core
 					DumpCPU("LD D, L");
 					break;
 				#endregion
+				#region 56 LD D, (HL)
+				case 0x56:
+					RegisterD = _memory.ReadByte(RegisterHL);
+					DumpCPU("LD D, (HL)");
+					break;
+				#endregion
+				#region 57 LD D, A
+				case 0x57:
+					RegisterD = RegisterA;
+					DumpCPU($"LD D, A");
+					break;
+				#endregion
+				#region 58 LD E, B
+				case 0x58:
+					RegisterE = RegisterB;
+					DumpCPU("LD E, B");
+					break;
+				#endregion
+				#region 59 LD E, C
+				case 0x59:
+					RegisterE = RegisterC;
+					DumpCPU("LD E, C");
+					break;
+				#endregion
+				#region 5A LD E, D
+				case 0x5A:
+					RegisterE = RegisterD;
+					DumpCPU("LD E, D");
+					break;
+				#endregion
+				#region 5B LD E, E
+				case 0x5B:
+					DumpCPU("LD E, E");
+					break;
+				#endregion
+				#region 5C LD E, H
+				case 0x5C:
+					RegisterE = RegisterH;
+					DumpCPU("LD E, H");
+					break;
+				#endregion
+				#region 5D LD E, L
+				case 0x5D:
+					RegisterE = RegisterL;
+					DumpCPU("LD E, L");
+					break;
+				#endregion
+				#region 5E LD E, (HL)
+				case 0x5E:
+					RegisterE = _memory.ReadByte(RegisterHL);
+					DumpCPU("LD E, (HL)");
+					break;
+				#endregion
+				#region 5F LD E, A
+				case 0x5F:
+					RegisterE = RegisterA;
+					DumpCPU("LD E, A");
+					break;
+				#endregion
+				#region 60 LD H, B
+				case 0x60:
+					RegisterH = RegisterB;
+					DumpCPU("LD H, B");
+					break;
+				#endregion
+				#region 61 LD H, C
+				case 0x61:
+					RegisterH = RegisterC;
+					DumpCPU("LD H, C");
+					break;
+				#endregion
+				#region 62 LD H, D
+				case 0x62:
+					RegisterH = RegisterD;
+					DumpCPU("LD H, D");
+					break;
+				#endregion
+				#region 63 LD H, E
+				case 0x63:
+					RegisterH = RegisterE;
+					DumpCPU("LD H, E");
+					break;
+				#endregion
+				#region 64 LD H, H
+				case 0x64:
+					DumpCPU("LD H, H");
+					break;
+				#endregion
+				#region 65 LD H, L
+				case 0x65:
+					RegisterH = RegisterL;
+					DumpCPU("LD H, L");
+					break;
+				#endregion
+				#region 66 LD H, (HL)
+				case 0x66:
+					RegisterH = _memory.ReadByte(RegisterHL);
+					DumpCPU("LD H, (HL)");
+					break;
+				#endregion
+				#region 67 LD H, A
+				case 0x67:
+					RegisterH = RegisterA;
+					DumpCPU($"LD H, A");
+					break;
+				#endregion
+				#region 68 LD L, B
+				case 0x68:
+					RegisterL = RegisterB;
+					DumpCPU("LD L, B");
+					break;
+				#endregion
+				#region 69 LD L, C
+				case 0x69:
+					RegisterL = RegisterC;
+					DumpCPU("LD L, C");
+					break;
+				#endregion
+				#region 6A LD L, D
+				case 0x6A:
+					RegisterL = RegisterD;
+					DumpCPU("LD L, D");
+					break;
+				#endregion
+				#region 6B LD L, E
+				case 0x6B:
+					RegisterL = RegisterE;
+					DumpCPU("LD L, E");
+					break;
+				#endregion
+				#region 6C LD L, H
+				case 0x6C:
+					RegisterL = RegisterH;
+					DumpCPU("LD L, H");
+					break;
+				#endregion
+				#region 6D LD L, L
+				case 0x6D:
+					DumpCPU("LD L, L");
+					break;
+				#endregion
+				#region 6E LD L, (HL)
+				case 0x6E:
+					RegisterL = _memory.ReadByte(RegisterHL);
+					DumpCPU("LD L, (HL)");
+					break;
+				#endregion
+				#region 6F LD L, A
+				case 0x6F:
+					RegisterL = RegisterA;
+					DumpCPU("LD L, A");
+					break;
+				#endregion
+				#region 70 LD (HL), B
+				case 0x70:
+					_memory.WriteByte(RegisterHL, RegisterB);
+					DumpCPU("LD (HL), B");
+					break;
+				#endregion
+				#region 71 LD (HL), C
+				case 0x71:
+					_memory.WriteByte(RegisterHL, RegisterC);
+					DumpCPU("LD (HL), C");
+					break;
+				#endregion
+				#region 72 LD (HL), D
+				case 0x72:
+					_memory.WriteByte(RegisterHL, RegisterD);
+					DumpCPU("LD (HL), D");
+					break;
+				#endregion
+				#region 73 LD (HL), E
+				case 0x73:
+					_memory.WriteByte(RegisterHL, RegisterE);
+					DumpCPU("LD (HL), E");
+					break;
+				#endregion
+				#region 74 LD (HL), H
+				case 0x74:
+					_memory.WriteByte(RegisterHL, RegisterH);
+					DumpCPU("LD (HL), H");
+					break;
+				#endregion
+				#region 75 LD (HL), L
+				case 0x75:
+					_memory.WriteByte(RegisterHL, RegisterL);
+					DumpCPU("LD (HL), L");
+					break;
+				#endregion
+
 				#region 77 LD (HL), A
-				case 0x77:  //LD (HL), A
-					RegisterHL = RegisterA;
-					DumpCPU($"LD (HL), A");
+				case 0x77:
+					_memory.WriteByte(RegisterHL, RegisterA);
+					DumpCPU("LD (HL), A");
 					break;
 				#endregion
 				#region 78 LD A, B
-				case 0x78:  //LD A, B
+				case 0x78:
 					RegisterA = RegisterB;
 					DumpCPU("LD A, B");
 					break;
 				#endregion
 				#region 79 LD A, C
-				case 0x79:  //LD A, C
+				case 0x79:
 					RegisterA = RegisterC;
 					DumpCPU("LD A, C");
 					break;
 				#endregion
 				#region 7A LD A, D
-				case 0x7A:  //LD A, D
+				case 0x7A:
 					RegisterA = RegisterD;
 					DumpCPU("LD A, D");
 					break;
 				#endregion
 				#region 7B LD A, E
-				case 0x7B:  //LD A, E
+				case 0x7B:
 					RegisterA = RegisterE;
 					DumpCPU("LD A, E");
 					break;
 				#endregion
 				#region 7C LD A, H
-				case 0x7C:  //LD A, H
+				case 0x7C:
 					RegisterA = RegisterH;
 					DumpCPU("LD A, H");
 					break;
 				#endregion
 				#region 7D LD A, L
-				case 0x7D:  //LD A, L
+				case 0x7D:
 					RegisterA = RegisterL;
 					DumpCPU("LD A, L");
 					break;
 				#endregion
 				#region 7E LD A, (HL)
-				case 0x7E:  //LD A, (HL)
-					RegisterA = (byte)RegisterHL;
+				case 0x7E:
+					RegisterA = _memory.ReadByte(RegisterHL);
 					DumpCPU("LD A, (HL)");
 					break;
 				#endregion
 				#region 7F LD A, A
-				case 0x7F:  //LD A, A
-					RegisterA = RegisterA;
+				case 0x7F:
 					DumpCPU("LD A, A");
 					break;
 				#endregion
+				#region 80 ADD A, B
+				case 0x80:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + (RegisterB & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + RegisterB) > 0xff;
+					RegisterA += RegisterB;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADD A, B");
+					break;
+				#endregion
+				#region 81 ADD A, C
+				case 0x81:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + (RegisterC & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + RegisterC) > 0xff;
+					RegisterA += RegisterC;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADD A, C");
+					break;
+				#endregion
+				#region 82 ADD A, D
+				case 0x82:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + (RegisterD & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + RegisterD) > 0xff;
+					RegisterA += RegisterD;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADD A, D");
+					break;
+				#endregion
+				#region 83 ADD A, E
+				case 0x83:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + (RegisterE & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + RegisterE) > 0xff;
+					RegisterA += RegisterE;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADD A, E");
+					break;
+				#endregion
+				#region 84 ADD A, H
+				case 0x84:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + (RegisterH & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + RegisterH) > 0xff;
+					RegisterA += RegisterH;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADD A, H");
+					break;
+				#endregion
+				#region 85 ADD A, L
+				case 0x85:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + (RegisterL & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + RegisterL) > 0xff;
+					RegisterA += RegisterL;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADD A, L");
+					break;
+				#endregion
+				#region 86 ADD A, (HL)
+				case 0x86:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + (_memory.ReadByte(RegisterHL) & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + _memory.ReadByte(RegisterHL)) > 0xff;
+					RegisterA += _memory.ReadByte(RegisterHL);
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADD A, (HL)");
+					break;
+				#endregion
+				#region 87 ADD A, A
+				case 0x87:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + (RegisterA & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + RegisterA) > 0xff;
+					RegisterA += RegisterA;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADD A, A");
+					break;
+				#endregion
+
+
+
+
+
+
+
+
+				#region 90 SUB B
+				case 0x90:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterB & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterB) >= 0;
+					RegisterA -= RegisterB;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SUB B");
+					break;
+				#endregion
+				#region 91 SUB C
+				case 0x91:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterC & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterC) >= 0;
+					RegisterA -= RegisterC;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SUB C");
+					break;
+				#endregion
+				#region 92 SUB D
+				case 0x92:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterD & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterD) >= 0;
+					RegisterA -= RegisterD;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SUB D");
+					break;
+				#endregion
+				#region 93 SUB E
+				case 0x93:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterE & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterE) >= 0;
+					RegisterA -= RegisterB;
+					ZeroFlag = RegisterE == 0;
+					DumpCPU("SUB E");
+					break;
+				#endregion
+				#region 94 SUB H
+				case 0x94:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterH & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterH) >= 0;
+					RegisterA -= RegisterH;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SUB H");
+					break;
+				#endregion
+				#region 95 SUB L
+				case 0x95:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterL & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterL) >= 0;
+					RegisterA -= RegisterL;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SUB L");
+					break;
+				#endregion
+				#region 96 SUB (HL)
+				case 0x96:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (_memory.ReadByte(RegisterHL) & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - _memory.ReadByte(RegisterHL)) >= 0;
+					RegisterA -= _memory.ReadByte(RegisterHL);
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SUB (HL)");
+					break;
+				#endregion
+				#region 97 SUB A
+				case 0x97:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterA & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterA) >= 0;
+					RegisterA -= RegisterA;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SUB A");
+					break;
+				#endregion
+
+
+
+
+
+
+
+
+				#region A0 AND B
+				case 0xA0:
+					SubtractFlag = false;
+					HalfCarryFlag = true;
+					CarryFlag = false;
+					RegisterA &= RegisterB;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("AND B");
+					break;
+				#endregion
+				#region A1 AND C
+				case 0xA1:
+					SubtractFlag = false;
+					HalfCarryFlag = true;
+					CarryFlag = false;
+					RegisterA &= RegisterC;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("AND C");
+					break;
+				#endregion
+				#region A2 AND D
+				case 0xA2:
+					SubtractFlag = false;
+					HalfCarryFlag = true;
+					CarryFlag = false;
+					RegisterA &= RegisterD;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("AND D");
+					break;
+				#endregion
+				#region A3 AND E
+				case 0xA3:
+					SubtractFlag = false;
+					HalfCarryFlag = true;
+					CarryFlag = false;
+					RegisterA &= RegisterE;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("AND E");
+					break;
+				#endregion
+				#region A4 AND H
+				case 0xA4:
+					SubtractFlag = false;
+					HalfCarryFlag = true;
+					CarryFlag = false;
+					RegisterA &= RegisterH;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("AND H");
+					break;
+				#endregion
+				#region A5 AND L
+				case 0xA5:
+					SubtractFlag = false;
+					HalfCarryFlag = true;
+					CarryFlag = false;
+					RegisterA &= RegisterL;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("AND L");
+					break;
+				#endregion
+				#region A6 AND (HL)
+				case 0xA6:
+					SubtractFlag = false;
+					HalfCarryFlag = true;
+					CarryFlag = false;
+					RegisterA &= _memory.ReadByte(RegisterHL);
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("AND (HL)");
+					break;
+				#endregion
+				#region A7 AND A
+				case 0xA7:
+					SubtractFlag = false;
+					HalfCarryFlag = true;
+					CarryFlag = false;
+					RegisterA &= RegisterA;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("AND A");
+					break;
+				#endregion
+
+
+
+
+
+
+
 				#region AF XOR A
 				case 0xAF:  //XOR A (4c)
 					DumpCPU($"XOR A");
@@ -697,11 +1214,126 @@ namespace JMGBE.Core
 					RegisterF = RegisterA == 0 ? (byte)0b10000000 : (byte)0b00000000;
 					break;
 				#endregion
+				#region B0 OR B
+				case 0xB0:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA |= RegisterB;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("OR B");
+					break;
+				#endregion
+				#region B1 OR C
+				case 0xB1:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA |= RegisterC;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("OR C");
+					break;
+				#endregion
+				#region B2 OR D
+				case 0xB2:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA |= RegisterD;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("OR D");
+					break;
+				#endregion
+				#region B3 OR E
+				case 0xB3:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA |= RegisterE;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("OR E");
+					break;
+				#endregion
+				#region B4 OR H
+				case 0xB4:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA |= RegisterH;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("OR H");
+					break;
+				#endregion
+				#region B5 OR L
+				case 0xB5:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA |= RegisterL;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("OR L");
+					break;
+				#endregion
+				#region B6 OR (HL)
+				case 0xB6:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA |= _memory.ReadByte(RegisterHL);
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("OR (HL)");
+					break;
+				#endregion
+				#region B7 OR A
+				case 0xB7:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA |= RegisterA;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("OR A");
+					break;
+				#endregion
+
+
+
+
+
+
+
+
+				#region C0 RET NZ
+				case 0xC0:
+					DumpCPU("RET NZ");
+					if (!ZeroFlag) PC = PopStack();
+					break;
+				#endregion
 				#region C1 POP BC
 				case 0xC1:
-					SP += 2;
-					RegisterBC = _memory.ReadUShort(SP);
+					RegisterBC = PopStack();
 					DumpCPU("POP BC");
+					break;
+				#endregion
+				#region C2 JP NZ, nn
+				case 0xC2:
+					if (!ZeroFlag) PC = ReadUShortOperand();
+					DumpCPU($"JP NZ, {Hex4String(PC)}");
+					break;
+				#endregion
+				#region C3 JP nn
+				case 0xC3:
+					PC = ReadUShortOperand();
+					DumpCPU($"JP {Hex4String(PC)}");
+					break;
+				#endregion
+				#region C4 CALL NZ, nn
+				case 0xC4:
+					if (!ZeroFlag)
+					{
+						PushStack(PC);
+						PC = ReadUShortOperand();
+					}
+					DumpCPU($"CALL NZ, {Hex4String(PC)}");
 					break;
 				#endregion
 				#region C5 PUSH BC
@@ -711,11 +1343,24 @@ namespace JMGBE.Core
 					DumpCPU("PUSH BC");
 					break;
 				#endregion
+
+
+				#region C8 RET Z
+				case 0xC8:
+					DumpCPU("RET Z");
+					if (ZeroFlag) PC = PopStack();
+					break;
+				#endregion
 				#region C9 RET
-				case 0xC9:  //RET
+				case 0xC9:
 					DumpCPU("RET");
-					SP += 2;
-					PC = _memory.ReadUShort(SP);
+					PC = PopStack();
+					break;
+				#endregion
+				#region CA JP Z, nn
+				case 0xCA:
+					if (ZeroFlag) PC = ReadUShortOperand();
+					DumpCPU($"JP NZ, {Hex4String(PC)}");
 					break;
 				#endregion
 				#region CB
@@ -749,28 +1394,110 @@ namespace JMGBE.Core
 					}
 					break;
 				#endregion
-				#region CD CALL nn
-				case 0xCD:  //CALL nn
-					_memory.WriteUShort(SP, (ushort)(PC + 2));
-					SP -= 2;
-					ushort nnCD = ReadUShortOperand();
-					DumpCPU($"CALL {Hex4String(nnCD)}");
-					PC = --nnCD;
+				#region CC CALL Z, nn
+				case 0xCC:
+					if (ZeroFlag)
+					{
+						PushStack(PC);
+						PC = ReadUShortOperand();
+					}
+					DumpCPU($"CALL Z, {Hex4String(PC)}");
 					break;
 				#endregion
+				#region CD CALL nn
+				case 0xCD:
+					PushStack(PC);
+					PC = ReadUShortOperand();
+					DumpCPU($"CALL {Hex4String(PC)}");
+					break;
+				#endregion
+
+
+				#region D0 RET NC
+				case 0xD0:
+					DumpCPU("RET NC");
+					if (!CarryFlag) PC = PopStack();
+					break;
+				#endregion
+				#region D1 POP DE
+				case 0xD1:
+					RegisterDE = PopStack();
+					DumpCPU("POP DE");
+					break;
+				#endregion
+				#region D2 JP NC, nn
+				case 0xD2:
+					if (!CarryFlag) PC = ReadUShortOperand();
+					DumpCPU($"JP NC, {Hex4String(PC)}");
+					break;
+				#endregion
+
+				#region D4 CALL NC, nn
+				case 0xD4:
+					if (!CarryFlag)
+					{
+						PushStack(PC);
+						PC = ReadUShortOperand();
+					}
+					DumpCPU($"CALL NC, {Hex4String(PC)}");
+					break;
+				#endregion
+
+
+
+				#region D8 RET C
+				case 0xD8:
+					DumpCPU("RET C");
+					if (CarryFlag) PC = PopStack();
+					break;
+				#endregion
+
+				#region DA JP C, nn
+				case 0xDA:
+					if (CarryFlag) PC = ReadUShortOperand();
+					DumpCPU($"JP C, {Hex4String(PC)}");
+					break;
+				#endregion
+
+				#region DC CALL C, nn
+				case 0xDC:
+					if (CarryFlag)
+					{
+						PushStack(PC);
+						PC = ReadUShortOperand();
+					}
+					DumpCPU($"CALL C, {Hex4String(PC)}");
+					break;
+				#endregion
+
+
+
 				#region E0 LD ($FF00 + n), A
-				case 0xE0:  //LDH (n), A
+				case 0xE0:
 					byte nE0 = ReadByteOperand();
 					DumpCPU($"LD ({Hex4String(0xFF00)} + {Hex2String(nE0)}), A");
 					_memory.WriteByte((ushort)(0xFF00 + nE0), RegisterA);
 					break;
 				#endregion
-				#region E2 LD ($FF00 + C), A
-				case 0xE2:  //LD ($FF00+C), A
-					_memory.WriteByte((ushort)(0xFF00 + RegisterC), RegisterA);
-					DumpCPU($"LD {Hex4String((ushort)(0xFF00 + RegisterC))}, {Hex2String(RegisterA)}");
+				#region E1 POP HL
+				case 0xE1:
+					RegisterHL = PopStack();
+					DumpCPU("POP HL");
 					break;
 				#endregion
+				#region E2 LD ($FF00 + C), A
+				case 0xE2:
+					_memory.WriteByte((ushort)(0xFF00 + RegisterC), RegisterA);
+					DumpCPU($"LD ({Hex4String(0xFF00)} + {Hex2String(RegisterC)}), A");
+					break;
+				#endregion
+
+
+
+
+
+
+
 				#region EA LD (nn), A
 				case 0xEA:  //LD (nn), A
 					ushort nnEA = ReadUShortOperand();
@@ -779,6 +1506,41 @@ namespace JMGBE.Core
 					PC += 2;
 					break;
 				#endregion
+
+
+
+
+
+				#region F0 LD A, ($FF00 + n)
+				case 0xF0:
+					byte nF0 = ReadByteOperand();
+					RegisterA = _memory.ReadByte((ushort)(0xFF00 + nF0));
+					DumpCPU($"LD A, ({Hex4String(0xFF00)} + {Hex2String(nF0)})");
+					break;
+				#endregion
+				#region F1 POP AF
+				case 0xF1:
+					RegisterAF = PopStack();
+					DumpCPU("POP AF");
+					break;
+				#endregion
+				#region F2 LD A, ($FF00 + C), A
+				case 0xF2:
+					RegisterA = _memory.ReadByte((ushort)(0xFF00 + RegisterC));
+					DumpCPU($"LD A, ({Hex4String(0xFF00)} + {Hex2String(RegisterC)})");
+					break;
+				#endregion
+
+
+
+
+
+
+
+
+
+
+
 				#region FE CP #
 				case 0xFE:  //CP #
 					byte nFE = ReadByteOperand();
@@ -789,6 +1551,7 @@ namespace JMGBE.Core
 					DumpCPU($"CP {Hex2String(nFE)}");
 					break;
 				#endregion
+
 				#region ERROR
 				default:
 					DumpCPU($"Instruction not programmed: {Hex2String(instruction)}");
@@ -800,6 +1563,17 @@ namespace JMGBE.Core
 			pci = 0;
 		}
 
+		//Stack helper methods.
+		public void PushStack(ushort value)
+		{
+			_memory.WriteUShort(SP, value);
+			SP -= 2;
+		}
+		public ushort PopStack()
+		{
+			SP += 2;
+			return _memory.ReadUShort(SP);
+		}
 		//8 bit helper methods.
 		private byte ReadByteOperand()
 		{
