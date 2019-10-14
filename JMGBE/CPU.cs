@@ -1024,14 +1024,86 @@ namespace JMGBE.Core
 					DumpCPU("ADD A, A");
 					break;
 				#endregion
-
-
-
-
-
-
-
-
+				#region 88 ADC A, B
+				case 0x88:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + ((CarryFlag ? RegisterB + 1 : RegisterB) & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + (CarryFlag ? RegisterB + 1 : RegisterB)) > 0xff;
+					RegisterA += (byte)(RegisterB + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADC A, B");
+					break;
+				#endregion
+				#region 89 ADC A, C
+				case 0x89:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + ((CarryFlag ? RegisterC + 1 : RegisterC) & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + (CarryFlag ? RegisterC + 1 : RegisterC)) > 0xff;
+					RegisterA += (byte)(RegisterC + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADC A, C");
+					break;
+				#endregion
+				#region 8A ADC A, D
+				case 0x8A:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + ((CarryFlag ? RegisterD + 1 : RegisterD) & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + (CarryFlag ? RegisterD + 1 : RegisterD)) > 0xff;
+					RegisterA += (byte)(RegisterD + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADC A, D");
+					break;
+				#endregion
+				#region 8B ADC A, E
+				case 0x8B:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + ((CarryFlag ? RegisterE + 1 : RegisterE) & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + (CarryFlag ? RegisterE + 1 : RegisterE)) > 0xff;
+					RegisterA += (byte)(RegisterE + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADC A, E");
+					break;
+				#endregion
+				#region 8C ADC A, H
+				case 0x8C:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + ((CarryFlag ? RegisterH + 1 : RegisterH) & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + (CarryFlag ? RegisterH + 1 : RegisterH)) > 0xff;
+					RegisterA += (byte)(RegisterH + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADC A, H");
+					break;
+				#endregion
+				#region 8D ADC A, L
+				case 0x8D:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + ((CarryFlag ? RegisterL + 1 : RegisterL) & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + (CarryFlag ? RegisterL + 1 : RegisterL)) > 0xff;
+					RegisterA += (byte)(RegisterL + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADC A, L");
+					break;
+				#endregion
+				#region 8E ADC A, (HL)
+				case 0x8E:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + ((CarryFlag ? _memory.ReadByte(RegisterHL) + 1 : _memory.ReadByte(RegisterHL)) & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + (CarryFlag ? _memory.ReadByte(RegisterHL) + 1 : _memory.ReadByte(RegisterHL))) > 0xff;
+					RegisterA += (byte)(_memory.ReadByte(RegisterHL) + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADC A, (HL)");
+					break;
+				#endregion
+				#region 8F ADC A, A
+				case 0x8F:
+					SubtractFlag = false;
+					HalfCarryFlag = ((RegisterA & 0b00001111) + ((CarryFlag ? RegisterA + 1 : RegisterA) & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + (CarryFlag ? RegisterA + 1 : RegisterA)) > 0xff;
+					RegisterA += (byte)(RegisterA + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("ADC A, A");
+					break;
+				#endregion
 				#region 90 SUB B
 				case 0x90:
 					SubtractFlag = true;
@@ -1112,8 +1184,17 @@ namespace JMGBE.Core
 					DumpCPU("SUB A");
 					break;
 				#endregion
-
-
+				//SBC
+				#region 98 SBC A, B
+				case 0x98:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - ((CarryFlag ? RegisterB + 1 : RegisterB) & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - (CarryFlag ? RegisterB + 1 : RegisterB)) >= 0;
+					RegisterA -= (byte)(RegisterB + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SUB A");
+					break;
+				#endregion
 
 
 
@@ -1338,13 +1419,19 @@ namespace JMGBE.Core
 				#endregion
 				#region C5 PUSH BC
 				case 0xC5:
-					_memory.WriteUShort(SP, RegisterBC);
-					SP -= 2;
+					PushStack(RegisterBC);
 					DumpCPU("PUSH BC");
 					break;
 				#endregion
 
-
+				#region C7 RST 00H
+				case 0xC7:
+					PushStack(PC);
+					PC = 0x0000;
+					pci = 0;
+					DumpCPU("RST 00H");
+					break;
+				#endregion
 				#region C8 RET Z
 				case 0xC8:
 					DumpCPU("RET Z");
@@ -1412,7 +1499,14 @@ namespace JMGBE.Core
 					break;
 				#endregion
 
-
+				#region CF RST 08H
+				case 0xCF:
+					PushStack(PC);
+					PC = 0x0008;
+					pci = 0;
+					DumpCPU("RST 08H");
+					break;
+				#endregion
 				#region D0 RET NC
 				case 0xD0:
 					DumpCPU("RET NC");
@@ -1442,9 +1536,21 @@ namespace JMGBE.Core
 					DumpCPU($"CALL NC, {Hex4String(PC)}");
 					break;
 				#endregion
+				#region D5 PUSH DE
+				case 0xD5:
+					PushStack(RegisterDE);
+					DumpCPU("PUSH DE");
+					break;
+				#endregion
 
-
-
+				#region D7 RST 10H
+				case 0xD7:
+					PushStack(PC);
+					PC = 0x0010;
+					pci = 0;
+					DumpCPU("RST 10H");
+					break;
+				#endregion
 				#region D8 RET C
 				case 0xD8:
 					DumpCPU("RET C");
@@ -1471,7 +1577,14 @@ namespace JMGBE.Core
 				#endregion
 
 
-
+				#region DF RST 18H
+				case 0xDF:
+					PushStack(PC);
+					PC = 0x0018;
+					pci = 0;
+					DumpCPU("RST 18H");
+					break;
+				#endregion
 				#region E0 LD ($FF00 + n), A
 				case 0xE0:
 					byte nE0 = ReadByteOperand();
@@ -1493,9 +1606,21 @@ namespace JMGBE.Core
 				#endregion
 
 
+				#region E5 PUSH HL
+				case 0xE5:
+					PushStack(RegisterHL);
+					DumpCPU("PUSH HL");
+					break;
+				#endregion
 
-
-
+				#region E7 RST 20H
+				case 0xE7:
+					PushStack(PC);
+					PC = 0x0020;
+					pci = 0;
+					DumpCPU("RST 20H");
+					break;
+				#endregion
 
 
 				#region EA LD (nn), A
@@ -1510,7 +1635,14 @@ namespace JMGBE.Core
 
 
 
-
+				#region EF RST 28H
+				case 0xEF:
+					PushStack(PC);
+					PC = 0x0028;
+					pci = 0;
+					DumpCPU("RST 28H");
+					break;
+				#endregion
 				#region F0 LD A, ($FF00 + n)
 				case 0xF0:
 					byte nF0 = ReadByteOperand();
@@ -1532,9 +1664,21 @@ namespace JMGBE.Core
 				#endregion
 
 
+				#region F5 PUSH AF
+				case 0xF5:
+					PushStack(RegisterAF);
+					DumpCPU("PUSH AF");
+					break;
+				#endregion
 
-
-
+				#region F7 RST 30H
+				case 0xF7:
+					PushStack(PC);
+					PC = 0x0030;
+					pci = 0;
+					DumpCPU("RST 30H");
+					break;
+				#endregion
 
 
 
@@ -1551,14 +1695,25 @@ namespace JMGBE.Core
 					DumpCPU($"CP {Hex2String(nFE)}");
 					break;
 				#endregion
-
+				#region FF RST 38H
+				case 0xFF:
+					PushStack(PC);
+					PC = 0x0038;
+					pci = 0;
+					DumpCPU("RST 38H");
+					break;
+				#endregion
 				#region ERROR
 				default:
 					DumpCPU($"Instruction not programmed: {Hex2String(instruction)}");
 					break;
 				#endregion
 			}
-			//TODO: Interrupt request
+			//Interrupt handling:
+			if (instruction == 0x76)
+			{
+				//Wait for an interrupt.
+			}
 			PC = (ushort)(PC + pci);
 			pci = 0;
 		}
@@ -1631,6 +1786,16 @@ namespace JMGBE.Core
 			SubtractFlag = 0x40,
 			HalfCarryFlag = 0x20,
 			CarryFlag = 0x10
+		}
+	
+		[Flags]
+		private enum InterruptFlag
+		{
+			JoypadIR = 0x10,
+			SerialIR = 0x08,
+			TimerIR = 0x04,
+			LCDIR = 0x02,
+			VBlank = 0x01
 		}
 	}
 }
