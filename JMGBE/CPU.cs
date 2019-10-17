@@ -1184,7 +1184,6 @@ namespace JMGBE.Core
 					DumpCPU("SUB A");
 					break;
 				#endregion
-				//SBC
 				#region 98 SBC A, B
 				case 0x98:
 					SubtractFlag = true;
@@ -1192,15 +1191,79 @@ namespace JMGBE.Core
 					CarryFlag = (RegisterA - (CarryFlag ? RegisterB + 1 : RegisterB)) >= 0;
 					RegisterA -= (byte)(RegisterB + (CarryFlag ? 1 : 0));
 					ZeroFlag = RegisterA == 0;
-					DumpCPU("SUB A");
+					DumpCPU("SBC A, B");
 					break;
 				#endregion
-
-
-
-
-
-
+				#region 99 SBC A, C
+				case 0x99:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - ((CarryFlag ? RegisterC + 1 : RegisterC) & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - (CarryFlag ? RegisterC + 1 : RegisterC)) >= 0;
+					RegisterA -= (byte)(RegisterC + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SBC A, C");
+					break;
+				#endregion
+				#region 9A SBC A, D
+				case 0x9A:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - ((CarryFlag ? RegisterD + 1 : RegisterD) & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - (CarryFlag ? RegisterD + 1 : RegisterD)) >= 0;
+					RegisterA -= (byte)(RegisterD + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SBC A, D");
+					break;
+				#endregion
+				#region 9B SBC A, E
+				case 0x9B:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - ((CarryFlag ? RegisterE + 1 : RegisterE) & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - (CarryFlag ? RegisterE + 1 : RegisterE)) >= 0;
+					RegisterA -= (byte)(RegisterE + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SBC A, E");
+					break;
+				#endregion
+				#region 9C SBC A, H
+				case 0x9C:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - ((CarryFlag ? RegisterH + 1 : RegisterH) & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - (CarryFlag ? RegisterH + 1 : RegisterH)) >= 0;
+					RegisterA -= (byte)(RegisterH + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SBC A, H");
+					break;
+				#endregion
+				#region 9D SBC A, L
+				case 0x9D:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - ((CarryFlag ? RegisterL + 1 : RegisterL) & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - (CarryFlag ? RegisterL + 1 : RegisterL)) >= 0;
+					RegisterA -= (byte)(RegisterL + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SBC A, L");
+					break;
+				#endregion
+				#region 9E SBC A, (HL)
+				case 0x9E:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - ((CarryFlag ? _memory.ReadByte(RegisterHL) + 1 : _memory.ReadByte(RegisterHL)) & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - (CarryFlag ? _memory.ReadByte(RegisterHL) + 1 : _memory.ReadByte(RegisterHL))) >= 0;
+					RegisterA -= (byte)(_memory.ReadByte(RegisterHL) + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SBC A, (HL)");
+					break;
+				#endregion
+				#region 9F SBC A, A
+				case 0x9F:
+					SubtractFlag = true;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - ((CarryFlag ? RegisterA + 1 : RegisterA) & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - (CarryFlag ? RegisterA + 1 : RegisterA)) >= 0;
+					RegisterA -= (byte)(RegisterA + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("SBC A, A");
+					break;
+				#endregion
 				#region A0 AND B
 				case 0xA0:
 					SubtractFlag = false;
@@ -1281,18 +1344,84 @@ namespace JMGBE.Core
 					DumpCPU("AND A");
 					break;
 				#endregion
-
-
-
-
-
-
-
+				#region A8 XOR B
+				case 0xA8:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA ^= RegisterB;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("XOR B");
+					break;
+				#endregion
+				#region A9 XOR C
+				case 0xA9:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA ^= RegisterC;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("XOR C");
+					break;
+				#endregion
+				#region AA XOR D
+				case 0xAA:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA ^= RegisterD;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("XOR D");
+					break;
+				#endregion
+				#region AB XOR E
+				case 0xAB:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA ^= RegisterE;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("XOR E");
+					break;
+				#endregion
+				#region AC XOR H
+				case 0xAC:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA ^= RegisterH;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("XOR H");
+					break;
+				#endregion
+				#region AD XOR L
+				case 0xAD:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA ^= RegisterL;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("XOR L");
+					break;
+				#endregion
+				#region AE XOR (HL)
+				case 0xAE:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					RegisterA ^= _memory.ReadByte(RegisterHL);
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("XOR (HL)");
+					break;
+				#endregion
 				#region AF XOR A
-				case 0xAF:  //XOR A (4c)
-					DumpCPU($"XOR A");
+				case 0xAF:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
 					RegisterA ^= RegisterA;
-					RegisterF = RegisterA == 0 ? (byte)0b10000000 : (byte)0b00000000;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU("XOR A");
 					break;
 				#endregion
 				#region B0 OR B
@@ -1375,14 +1504,78 @@ namespace JMGBE.Core
 					DumpCPU("OR A");
 					break;
 				#endregion
-
-
-
-
-
-
-
-
+				#region B8 CP B
+				case 0xB8:
+					SubtractFlag = true;
+					ZeroFlag = RegisterA == RegisterB;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterB & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterB) >= 0;
+					DumpCPU("CP B");
+					break;
+				#endregion
+				#region B9 CP C
+				case 0xB9:
+					SubtractFlag = true;
+					ZeroFlag = RegisterA == RegisterC;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterC & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterC) >= 0;
+					DumpCPU("CP C");
+					break;
+				#endregion
+				#region BA CP D
+				case 0xBA:
+					SubtractFlag = true;
+					ZeroFlag = RegisterA == RegisterD;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterD & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterD) >= 0;
+					DumpCPU("CP D");
+					break;
+				#endregion
+				#region BB CP E
+				case 0xBB:
+					SubtractFlag = true;
+					ZeroFlag = RegisterA == RegisterE;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterE & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterE) >= 0;
+					DumpCPU("CP E");
+					break;
+				#endregion
+				#region BC CP H
+				case 0xBC:
+					SubtractFlag = true;
+					ZeroFlag = RegisterA == RegisterH;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterH & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterH) >= 0;
+					DumpCPU("CP H");
+					break;
+				#endregion
+				#region BD CP L
+				case 0xBD:
+					SubtractFlag = true;
+					ZeroFlag = RegisterA == RegisterL;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterL & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterL) >= 0;
+					DumpCPU("CP L");
+					break;
+				#endregion
+				#region BE CP (HL)
+				case 0xBE:
+					SubtractFlag = true;
+					ZeroFlag = RegisterA == _memory.ReadByte(RegisterHL);
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (_memory.ReadByte(RegisterHL) & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - _memory.ReadByte(RegisterHL)) >= 0;
+					DumpCPU("CP (HL)");
+					break;
+				#endregion
+				#region BF CP A
+				case 0xBF:
+					SubtractFlag = true;
+					ZeroFlag = RegisterA == RegisterA;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (RegisterA & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - RegisterA) >= 0;
+					DumpCPU("CP A");
+					break;
+				#endregion
 				#region C0 RET NZ
 				case 0xC0:
 					DumpCPU("RET NZ");
@@ -1423,7 +1616,17 @@ namespace JMGBE.Core
 					DumpCPU("PUSH BC");
 					break;
 				#endregion
-
+				#region C6 ADD A, n
+				case 0xC6:
+					SubtractFlag = false;
+					byte nC6 = ReadByteOperand();
+					HalfCarryFlag = ((RegisterA & 0b00001111) + (nC6 & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + nC6) > 0xff;
+					RegisterA += nC6;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU($"ADD A, {Hex2String(nC6)}");
+					break;
+				#endregion
 				#region C7 RST 00H
 				case 0xC7:
 					PushStack(PC);
@@ -1495,10 +1698,21 @@ namespace JMGBE.Core
 				case 0xCD:
 					PushStack(PC);
 					PC = ReadUShortOperand();
+					//TODO: Forse servira' fare pci = 0.
 					DumpCPU($"CALL {Hex4String(PC)}");
 					break;
 				#endregion
-
+				#region CE ADC A, n
+				case 0xCE:
+					SubtractFlag = false;
+					byte nCE = ReadByteOperand();
+					HalfCarryFlag = ((RegisterA & 0b00001111) + ((CarryFlag ? nCE + 1 : nCE) & 0b00001111)) > 0xf;
+					CarryFlag = (RegisterA + (CarryFlag ? nCE + 1 : nCE)) > 0xff;
+					RegisterA += (byte)(nCE + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU($"ADC A, {Hex2String(nCE)}");
+					break;
+				#endregion
 				#region CF RST 08H
 				case 0xCF:
 					PushStack(PC);
@@ -1525,7 +1739,7 @@ namespace JMGBE.Core
 					DumpCPU($"JP NC, {Hex4String(PC)}");
 					break;
 				#endregion
-
+				//D3
 				#region D4 CALL NC, nn
 				case 0xD4:
 					if (!CarryFlag)
@@ -1542,7 +1756,17 @@ namespace JMGBE.Core
 					DumpCPU("PUSH DE");
 					break;
 				#endregion
-
+				#region D6 SUB n
+				case 0xD6:
+					SubtractFlag = true;
+					byte nD6 = ReadByteOperand();
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (nD6 & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - nD6) >= 0;
+					RegisterA -= nD6;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU($"SUB {Hex2String(nD6)}");
+					break;
+				#endregion
 				#region D7 RST 10H
 				case 0xD7:
 					PushStack(PC);
@@ -1564,7 +1788,7 @@ namespace JMGBE.Core
 					DumpCPU($"JP C, {Hex4String(PC)}");
 					break;
 				#endregion
-
+				//DB
 				#region DC CALL C, nn
 				case 0xDC:
 					if (CarryFlag)
@@ -1575,8 +1799,18 @@ namespace JMGBE.Core
 					DumpCPU($"CALL C, {Hex4String(PC)}");
 					break;
 				#endregion
-
-
+				//DD
+				#region DE SBC A, n
+				case 0xDE:
+					SubtractFlag = true;
+					byte nDE = ReadByteOperand();
+					HalfCarryFlag = ((RegisterA & 0b00001111) - ((CarryFlag ? nDE + 1 : RegisterB) & nDE)) >= 0;
+					CarryFlag = (RegisterA - (CarryFlag ? nDE + 1 : nDE)) >= 0;
+					RegisterA -= (byte)(nDE + (CarryFlag ? 1 : 0));
+					ZeroFlag = RegisterA == 0;
+					DumpCPU($"SBC A, {Hex2String(nDE)}");
+					break;
+				#endregion
 				#region DF RST 18H
 				case 0xDF:
 					PushStack(PC);
@@ -1604,15 +1838,25 @@ namespace JMGBE.Core
 					DumpCPU($"LD ({Hex4String(0xFF00)} + {Hex2String(RegisterC)}), A");
 					break;
 				#endregion
-
-
+				//E3
+				//E4
 				#region E5 PUSH HL
 				case 0xE5:
 					PushStack(RegisterHL);
 					DumpCPU("PUSH HL");
 					break;
 				#endregion
-
+				#region E6 AND n
+				case 0xE6:
+					SubtractFlag = false;
+					HalfCarryFlag = true;
+					CarryFlag = false;
+					byte nE6 = ReadByteOperand();
+					RegisterA &= nE6;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU($"AND {Hex2String(nE6)}");
+					break;
+				#endregion
 				#region E7 RST 20H
 				case 0xE7:
 					PushStack(PC);
@@ -1621,20 +1865,44 @@ namespace JMGBE.Core
 					DumpCPU("RST 20H");
 					break;
 				#endregion
-
-
-				#region EA LD (nn), A
-				case 0xEA:  //LD (nn), A
-					ushort nnEA = ReadUShortOperand();
-					_memory.WriteByte(nnEA, RegisterA);
-					DumpCPU($"LD ({Hex4String(nnEA)}), A");
-					PC += 2;
+				#region E8 ADD SP, n
+				case 0xE8:
+					ZeroFlag = true;
+					SubtractFlag = true;
+					sbyte nE8 = ReadSbyteOperand();
+					SP = (ushort)(SP + nE8);
+					HalfCarryFlag = (nE8 & 0b10000000) != 0;
+					CarryFlag = (nE8 & 0b10000000) != 0;
 					break;
 				#endregion
-
-
-
-
+				#region E9 JP (HL)
+				case 0xE9:
+					PC = RegisterHL;
+					DumpCPU($"JP ({Hex4String(RegisterHL)})");
+					pci = 0;
+					break;
+				#endregion
+				#region EA LD (nn), A
+				case 0xEA:
+					ushort nEA = ReadUShortOperand();
+					_memory.WriteByte(nEA, RegisterA);
+					DumpCPU($"LD ({Hex4String(nEA)}), A");
+					break;
+				#endregion
+				//EB
+				//EC
+				//ED
+				#region EE XOR n
+				case 0xEE:
+					SubtractFlag = false;
+					HalfCarryFlag = true;
+					CarryFlag = false;
+					byte nEE = ReadByteOperand();
+					RegisterA &= nEE;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU($"XOR {Hex2String(nEE)}");
+					break;
+				#endregion
 				#region EF RST 28H
 				case 0xEF:
 					PushStack(PC);
@@ -1663,14 +1931,24 @@ namespace JMGBE.Core
 					break;
 				#endregion
 
-
+				//F4
 				#region F5 PUSH AF
 				case 0xF5:
 					PushStack(RegisterAF);
 					DumpCPU("PUSH AF");
 					break;
 				#endregion
-
+				#region F6 OR n
+				case 0xF6:
+					SubtractFlag = false;
+					HalfCarryFlag = false;
+					CarryFlag = false;
+					byte nF6 = ReadByteOperand();
+					RegisterA |= nF6;
+					ZeroFlag = RegisterA == 0;
+					DumpCPU($"OR {Hex2String(nF6)}");
+					break;
+				#endregion
 				#region F7 RST 30H
 				case 0xF7:
 					PushStack(PC);
@@ -1679,19 +1957,39 @@ namespace JMGBE.Core
 					DumpCPU("RST 30H");
 					break;
 				#endregion
+				#region F8 LD HL, SP+n
+				case 0xF8:
+					ZeroFlag = false;
+					SubtractFlag = false;
+					sbyte nF8 = ReadSbyteOperand();
+					RegisterHL = (ushort)(SP + nF8);
+					HalfCarryFlag = (nF8 & 0b10000000) != 1;
+					CarryFlag = (nF8 & 0b10000000) != 1;
+					DumpCPU($"LD HL, SP + {Hex2String((byte)nF8)}");
+					break;
+				#endregion
+				#region F9 LD SP, HL
+				case 0xF9:
+					SP = RegisterHL;
+					DumpCPU("LD SP, HL");
+					break;
+				#endregion
+				#region FA LD A, (nn)
+				case 0xFA:
+					RegisterA = _memory.ReadByte(ReadUShortOperand());
+					DumpCPU($"LD A, {Hex2String(RegisterA)}");
+					break;
+				#endregion
 
-
-
-
-
-
-				#region FE CP #
-				case 0xFE:  //CP #
-					byte nFE = ReadByteOperand();
-					ZeroFlag = RegisterA == 0;
+				//FC
+				//FD
+				#region FE CP 8n
+				case 0xFE:
 					SubtractFlag = true;
-					HalfCarryFlag = (RegisterA & 0b00001111) == 0;
-					CarryFlag = RegisterA < nFE;
+					byte nFE = ReadByteOperand();
+					ZeroFlag = RegisterA == nFE;
+					HalfCarryFlag = ((RegisterA & 0b00001111) - (nFE & 0b00001111)) >= 0;
+					CarryFlag = (RegisterA - nFE) >= 0;
 					DumpCPU($"CP {Hex2String(nFE)}");
 					break;
 				#endregion
