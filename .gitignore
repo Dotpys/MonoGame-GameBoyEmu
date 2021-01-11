@@ -3,3 +3,4 @@
 .vscode/
 *.bin
 *.gb
+JMGBE.GUI/logs/lastlog.txt
