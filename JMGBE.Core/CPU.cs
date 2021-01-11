@@ -120,10 +120,16 @@ namespace JMGBE.Core
 				{0x04, new Instruction( 4, Execute0x04, FetchNone, "INC B")},
 				{0x05, new Instruction( 4, Execute0x05, FetchNone, "DEC B")},
 				{0x06, new Instruction( 8, Execute0x06, FetchIm8U, "LD B, 0x{2:X2}")},
+				{0x07, new Instruction( 4, Execute0x07, FetchNone, "RLCA")},
+				{0x08, new Instruction(20, Execute0x08, FetchIm16, "LD (0x{0:X4}), SP")},
 				{0x09, new Instruction( 8, Execute0x09, FetchNone, "ADD HL, BC")},
+				{0x0A, new Instruction( 8, Execute0x0A, FetchNone, "LD A, (BC)")},
+				{0x0B, new Instruction( 8, Execute0x0B, FetchNone, "DEC BC")},
 				{0x0C, new Instruction( 4, Execute0x0C, FetchNone, "INC C")},
 				{0x0D, new Instruction( 4, Execute0x0D, FetchNone, "DEC C")},
 				{0x0E, new Instruction( 8, Execute0x0E, FetchIm8U, "LD C, 0x{2:X2}")},
+				{0x0F, new Instruction( 4, Execute0x0F, FetchNone, "RRCA")},
+				{0x10, new Instruction( 4, Execute0x10, FetchIm8U, "STOP")},
 				{0x11, new Instruction(12, Execute0x11, FetchIm16, "LD DE, 0x{0:X4}")},
 				{0x12, new Instruction( 8, Execute0x12, FetchNone, "LD (DE), A")},
 				{0x13, new Instruction( 8, Execute0x13, FetchNone, "INC DE")},
@@ -134,24 +140,39 @@ namespace JMGBE.Core
 				{0x18, new Instruction(12, Execute0x18, FetchIm8S, "JR 0x{1:X2}")},
 				{0x19, new Instruction( 8, Execute0x19, FetchNone, "ADD HL, DE")},
 				{0x1A, new Instruction( 8, Execute0x1A, FetchNone, "LD A, (DE)")},
+				{0x1B, new Instruction( 8, Execute0x1B, FetchNone, "DEC DE")},
 				{0x1C, new Instruction( 4, Execute0x1C, FetchNone, "INC E")},
 				{0x1D, new Instruction( 4, Execute0x1D, FetchNone, "DEC E")},
 				{0x1E, new Instruction( 8, Execute0x1E, FetchIm8U, "LD E, 0x{2:X2}")},
-				{0x20, new Instruction(12, Execute0x20, FetchIm8S, "JR NZ, 0x{1:X2}")},		//TODO: Rivedere il funzionamento di clock cycles (12/8)
+				{0x1F, new Instruction( 4, Execute0x1F, FetchNone, "RRA")},
+				{0x20, new Instruction(12, Execute0x20, FetchIm8S, "JR NZ, 0x{1:X2}")},
 				{0x21, new Instruction(12, Execute0x21, FetchIm16, "LD HL, 0x{0:X4}")},
 				{0x22, new Instruction( 8, Execute0x22, FetchNone, "LD (HL+), A")},
 				{0x23, new Instruction( 8, Execute0x23, FetchNone, "INC HL")},
 				{0x24, new Instruction( 4, Execute0x24, FetchNone, "INC H")},
 				{0x25, new Instruction( 4, Execute0x25, FetchNone, "DEC H")},
-				{0x28, new Instruction(12, Execute0x28, FetchIm8S, "JR Z, 0x{1:X2}")},		//TODO: Rivedere il funzionamento di clock cycles (12/8)
+				{0x26, new Instruction( 8, Execute0x26, FetchIm8U, "LD H, 0x{2:X2}")},
+				{0x27, new Instruction( 4, Execute0x27, FetchNone, "DAA")},
+				{0x28, new Instruction(12, Execute0x28, FetchIm8S, "JR Z, 0x{1:X2}")},
 				{0x29, new Instruction( 8, Execute0x29, FetchNone, "ADD HL, HL")},
+				{0x2A, new Instruction( 8, Execute0x2A, FetchNone, "LD A, (HL+)")},
+				{0x2B, new Instruction( 8, Execute0x2B, FetchNone, "DEC HL")},
 				{0x2C, new Instruction( 4, Execute0x2C, FetchNone, "INC L")},
 				{0x2D, new Instruction( 4, Execute0x2D, FetchNone, "DEC L")},
 				{0x2E, new Instruction( 8, Execute0x2E, FetchIm8U, "LD L, 0x{2:X2}")},
+				{0x2F, new Instruction( 4, Execute0x2F, FetchNone, "CPL")},
+				{0x30, new Instruction(12, Execute0x30, FetchIm8S, "JR NC, 0x{1:X2}")},
 				{0x31, new Instruction(12, Execute0x31, FetchIm16, "LD SP, 0x{0:X4}")},
 				{0x32, new Instruction( 8, Execute0x32, FetchNone, "LD (HL-), A")},
 				{0x33, new Instruction( 8, Execute0x33, FetchNone, "INC SP")},
+				{0x34, new Instruction(12, Execute0x34, FetchNone, "INC (HL)")},
+				{0x35, new Instruction(12, Execute0x35, FetchNone, "DEC (HL)")},
+				{0x36, new Instruction(12, Execute0x36, FetchIm8U, "LD (HL), 0x{2:X2}")},
+				{0x37, new Instruction( 4, Execute0x37, FetchNone, "SCF")},
+				{0x38, new Instruction(12, Execute0x38, FetchIm8S, "JR C, 0x{1:X2}")},
 				{0x39, new Instruction( 8, Execute0x39, FetchNone, "ADD HL, SP")},
+				{0x3A, new Instruction( 8, Execute0x3A, FetchNone, "LD A, (HL-)")},
+				{0x3B, new Instruction( 8, Execute0x3B, FetchNone, "DEC SP")},
 				{0x3C, new Instruction( 4, Execute0x3C, FetchNone, "INC A")},
 				{0x3D, new Instruction( 4, Execute0x3D, FetchNone, "DEC A")},
 				{0x3E, new Instruction( 8, Execute0x3E, FetchIm8U, "LD A, 0x{2:X2}")},
@@ -178,7 +199,15 @@ namespace JMGBE.Core
 				{0x53, new Instruction( 4, Execute0x53, FetchNone, "LD D, E")},
 				{0x54, new Instruction( 4, Execute0x54, FetchNone, "LD D, H")},
 				{0x55, new Instruction( 4, Execute0x55, FetchNone, "LD D, L")},
+				{0x56, new Instruction( 8, Execute0x56, FetchNone, "LD D, (HL)")},
 				{0x57, new Instruction( 4, Execute0x57, FetchNone, "LD D, A")},
+				{0x58, new Instruction( 4, Execute0x58, FetchNone, "LD E, B")},
+
+
+
+
+
+
 				{0x5F, new Instruction( 4, Execute0x5F, FetchNone, "LD E, A")},
 				{0x60, new Instruction( 4, Execute0x60, FetchNone, "LD H, B")},
 				{0x61, new Instruction( 4, Execute0x61, FetchNone, "LD H, C")},
@@ -188,12 +217,46 @@ namespace JMGBE.Core
 				{0x65, new Instruction( 4, Execute0x65, FetchNone, "LD H, L")},
 				{0x66, new Instruction( 8, Execute0x66, FetchNone, "LD H, (HL)")},
 				{0x67, new Instruction( 4, Execute0x67, FetchNone, "LD H, A")},
-				{0x7C, new Instruction( 4, Execute0x7C, FetchNone, "LD A, H")},
-				{0x7D, new Instruction( 4, Execute0x7D, FetchNone, "LD A, L")},
+				
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 				{0x77, new Instruction( 8, Execute0x77, FetchNone, "LD (HL), A")},
 				{0x78, new Instruction( 4, Execute0x78, FetchNone, "LD A, B")},
+
+
 				{0x7B, new Instruction( 4, Execute0x7B, FetchNone, "LD A, E")},
+				{0x7C, new Instruction( 4, Execute0x7C, FetchNone, "LD A, H")},
+				{0x7D, new Instruction( 4, Execute0x7D, FetchNone, "LD A, L")},
+				
+				
+
+
+
+
+
+
 				{0x86, new Instruction( 8, Execute0x86, FetchNone, "ADD A, (HL)")},
+				
+
+
+
+
+
+
+
+
 				{0x90, new Instruction( 4, Execute0x90, FetchNone, "SUB B")},
 				{0xAF, new Instruction( 4, Execute0xAF, FetchNone, "XOR A")},
 				{0xBE, new Instruction( 8, Execute0xBE, FetchNone, "CP (HL)")},
@@ -211,6 +274,7 @@ namespace JMGBE.Core
 				{0xF3, new Instruction( 4, Execute0xF3, FetchNone, "DI")},
 				{0xFB, new Instruction( 4, Execute0xFB, FetchNone, "EI")},
 				{0xFE, new Instruction( 8, Execute0xFE, FetchIm8U, "CP 0x{2:X2}")},
+
 			};
 
 			cb_opcodes = new Dictionary<byte, Instruction>()
@@ -269,7 +333,9 @@ namespace JMGBE.Core
 		}
 
 		//Fetch
-		void FetchNone() { }
+		void FetchNone()
+		{
+		}
 		void FetchIm8S()
 		{
 			immediate8s = _mmu.ReadSByte(PC + 1);
@@ -290,12 +356,43 @@ namespace JMGBE.Core
 		{
 
 		}
-		void Execute0x01() => BC = immediate16;
-		void Execute0x02() => _mmu.WriteByte(BC, A);
-		void Execute0x03() => BC++;
-		void Execute0x04() => INC(ref B);
-		void Execute0x05() => DEC(ref B);
-		void Execute0x06() => B = immediate8u;
+		void Execute0x01()
+		{
+			BC = immediate16;
+		}
+		void Execute0x02()
+		{
+			_mmu.WriteByte(BC, A);
+		}
+		void Execute0x03()
+		{
+			BC++;
+		}
+		void Execute0x04()
+		{
+			INC(ref B);
+		}
+		void Execute0x05()
+		{
+			DEC(ref B);
+		}
+		void Execute0x06()
+		{
+			B = immediate8u;
+		}
+		void Execute0x07()
+		{
+			CarryFlag = A.CheckBit(7);
+			SubtractFlag = false;
+			HalfCarryFlag = false;
+			A <<= 1;
+			ZeroFlag = A == 0;
+		}
+		void Execute0x08()
+		{
+			_mmu.WriteByte(immediate16, (byte)SP);
+			_mmu.WriteByte(immediate16+1, (byte)(SP >> 8));
+		}
 		void Execute0x09()
 		{
 			SubtractFlag = false;
@@ -303,15 +400,62 @@ namespace JMGBE.Core
 			CarryFlag = ((HL & 0xffff) + (BC & 0xffff)) > 0xffff;
 			HL += BC;
 		}
-		void Execute0x0C() => INC(ref C);
-		void Execute0x0D() => DEC(ref C);
-		void Execute0x0E() => C = immediate8u;
-		void Execute0x11() => DE = immediate16;
-		void Execute0x12() => _mmu.WriteByte(DE, A);
-		void Execute0x13() => DE++;
-		void Execute0x14() => INC(ref D);
-		void Execute0x15() => DEC(ref D);
-		void Execute0x16() => D = immediate8u;
+		void Execute0x0A()
+		{
+			A = _mmu.ReadByte(BC);
+		}
+		void Execute0x0B()
+		{
+			BC--;
+		}
+		void Execute0x0C()
+		{
+			INC(ref C);
+		}
+		void Execute0x0D()
+		{
+			DEC(ref C);
+		}
+		void Execute0x0E()
+		{
+			C = immediate8u;
+		}
+		void Execute0x0F()
+		{
+			SubtractFlag = false;
+			HalfCarryFlag = false;
+			CarryFlag = A.CheckBit(0);
+			A >>= 1;
+			ZeroFlag = A == 0;
+		}
+		void Execute0x10()
+		{
+			//TODO
+		}
+		void Execute0x11()
+		{
+			DE = immediate16;
+		}
+		void Execute0x12()
+		{
+			_mmu.WriteByte(DE, A);
+		}
+		void Execute0x13()
+		{
+			DE++;
+		}
+		void Execute0x14()
+		{
+			INC(ref D);
+		}
+		void Execute0x15()
+		{
+			DEC(ref D);
+		}
+		void Execute0x16()
+		{
+			D = immediate8u;
+		}
 		void Execute0x17()
 		{
 			SubtractFlag = false;
@@ -333,24 +477,75 @@ namespace JMGBE.Core
 			CarryFlag = ((HL & 0xffff) + (DE & 0xffff)) > 0xffff;
 			HL += DE;
 		}
-		void Execute0x1A() => A = _mmu.ReadByte(DE);
-		void Execute0x1C() => INC(ref E);
-		void Execute0x1D() => DEC(ref E);
-		void Execute0x1E() => E = immediate8u;
+		void Execute0x1A()
+		{
+			A = _mmu.ReadByte(DE);
+		}
+		void Execute0x1B()
+		{
+			DE--;
+		}
+		void Execute0x1C()
+		{
+			INC(ref E);
+		}
+		void Execute0x1D()
+		{
+			DEC(ref E);
+		}
+		void Execute0x1E()
+		{
+			E = immediate8u;
+		}
+		void Execute0x1F()
+		{
+			SubtractFlag = false;
+			HalfCarryFlag = false;
+			byte mask = CarryFlag ? (byte)0x80 : (byte)0;
+			CarryFlag = A.CheckBit(0);
+			A >>= 1;
+			A |= mask;
+			ZeroFlag = A == 0;
+		}
 		void Execute0x20()
 		{
+			//TODO: Rivedere il funzionamento di clock cycles (12/8)
 			//If the zero flag is reset...
 			if (!ZeroFlag)
 				//...the PC will be set relative to the instruction NEXT to JR.
 				PC = (ushort)(PC + immediate8s);
 		}
-		void Execute0x21() => HL = immediate16;
-		void Execute0x22() => _mmu.WriteByte(HL++, A);
-		void Execute0x23() => HL++;
-		void Execute0x24() => INC(ref H);
-		void Execute0x25() => DEC(ref H);
+		void Execute0x21()
+		{
+			HL = immediate16;
+		}
+		void Execute0x22()
+		{
+			_mmu.WriteByte(HL++, A);
+		}
+		void Execute0x23()
+		{
+			HL++;
+		}
+		void Execute0x24()
+		{
+			INC(ref H);
+		}
+		void Execute0x25()
+		{
+			DEC(ref H);
+		}
+		void Execute0x26()
+		{
+			H = immediate8u;
+		}
+		void Execute0x27()
+		{
+			//TODO
+		}
 		void Execute0x28()
 		{
+			//TODO: Rivedere il funzionamento di clock cycles (12/8)
 			//If the zero flag is set...
 			if (ZeroFlag)
 				//...the PC will be set relative to the instruction NEXT to JR.
@@ -363,12 +558,80 @@ namespace JMGBE.Core
 			CarryFlag = ((HL & 0xffff) + (HL & 0xffff)) > 0xffff;
 			HL += HL;
 		}
-		void Execute0x2C() => INC(ref L);
-		void Execute0x2D() => DEC(ref L);
-		void Execute0x2E() => L = immediate8u;
-		void Execute0x31() => SP = immediate16;
-		void Execute0x32() => _mmu.WriteByte(HL--, A);
-		void Execute0x33() => SP++;
+		void Execute0x2A()
+		{
+			A = _mmu.ReadByte(HL++);
+		}
+		void Execute0x2B()
+		{
+			HL--;
+		}
+		void Execute0x2C()
+		{
+			INC(ref L);
+		}
+		void Execute0x2D()
+		{
+			DEC(ref L);
+		}
+		void Execute0x2E()
+		{
+			L = immediate8u;
+		}
+		void Execute0x2F()
+		{
+			SubtractFlag = true;
+			HalfCarryFlag = true;
+			A = (byte)~A;
+		}
+		void Execute0x30()
+		{
+			//TODO: Rivedere il funzionamento di clock cycles (12/8)
+			//If the zero flag is set...
+			if (!CarryFlag)
+				//...the PC will be set relative to the instruction NEXT to JR.
+				PC = (ushort)(PC + immediate8s);
+		}
+		void Execute0x31()
+		{
+			SP = immediate16;
+		}
+		void Execute0x32()
+		{
+			_mmu.WriteByte(HL--, A);
+		}
+		void Execute0x33()
+		{
+			SP++;
+		}
+		void Execute0x34()
+		{
+			byte temp = _mmu.ReadByte(HL);
+			INC(ref temp);
+			_mmu.WriteByte(HL, temp);
+		}
+		void Execute0x35()
+		{
+			byte temp = _mmu.ReadByte(HL);
+			DEC(ref temp);
+			_mmu.WriteByte(HL, temp);
+		}
+		void Execute0x36()
+		{
+			_mmu.WriteByte(HL, immediate8u);
+		}
+		void Execute0x37()
+		{
+			//TODO
+		}
+		void Execute0x38()
+		{
+			//TODO: Rivedere il funzionamento di clock cycles (12/8)
+			//If the zero flag is set...
+			if (CarryFlag)
+				//...the PC will be set relative to the instruction NEXT to JR.
+				PC = (ushort)(PC + immediate8s);
+		}
 		void Execute0x39()
 		{
 			SubtractFlag = false;
@@ -376,9 +639,26 @@ namespace JMGBE.Core
 			CarryFlag = ((HL & 0xffff) + (SP & 0xffff)) > 0xffff;
 			HL += SP;
 		}
-		void Execute0x3C() => INC(ref A);
-		void Execute0x3D() => DEC(ref A);
-		void Execute0x3E() => A = immediate8u;
+		void Execute0x3A()
+		{
+			A = _mmu.ReadByte(HL--);
+		}
+		void Execute0x3B()
+		{
+			SP--;
+		}
+		void Execute0x3C()
+		{
+			INC(ref A);
+		}
+		void Execute0x3D()
+		{
+			DEC(ref A);
+		}
+		void Execute0x3E()
+		{
+			A = immediate8u;
+		}
 		void Execute0x3F()
 		{
 			CarryFlag = !CarryFlag;
@@ -388,48 +668,161 @@ namespace JMGBE.Core
 		void Execute0x40()
 		{
 		}
-		void Execute0x41() => B = C;
-		void Execute0x42() => B = D;
-		void Execute0x43() => B = E;
-		void Execute0x44() => B = H;
-		void Execute0x45() => B = L;
-		void Execute0x46() => B = _mmu.ReadByte(HL);
-		void Execute0x47() => B = A;
-		void Execute0x48() => C = B;
+		void Execute0x41()
+		{
+			B = C;
+		}
+		void Execute0x42()
+		{
+			B = D;
+		}
+		void Execute0x43()
+		{
+			B = E;
+		}
+		void Execute0x44()
+		{
+			B = H;
+		}
+		void Execute0x45()
+		{
+			B = L;
+		}
+		void Execute0x46()
+		{
+			B = _mmu.ReadByte(HL);
+		}
+		void Execute0x47()
+		{
+			B = A;
+		}
+		void Execute0x48()
+		{
+			C = B;
+		}
 		void Execute0x49()
 		{
 		}
-		void Execute0x4A() => C = D;
-		void Execute0x4B() => C = E;
-		void Execute0x4C() => C = H;
-		void Execute0x4D() => C = L;
-		void Execute0x4E() => C = _mmu.ReadByte(HL);
-		void Execute0x4F() => C = A;
-		void Execute0x50() => D = B;
-		void Execute0x51() => D = C;
+		void Execute0x4A()
+		{
+			C = D;
+		}
+		void Execute0x4B()
+		{
+			C = E;
+		}
+		void Execute0x4C()
+		{
+			C = H;
+		}
+		void Execute0x4D()
+		{
+			C = L;
+		}
+		void Execute0x4E()
+		{
+			C = _mmu.ReadByte(HL);
+		}
+		void Execute0x4F()
+		{
+			C = A;
+		}
+		void Execute0x50()
+		{
+			D = B;
+		}
+		void Execute0x51()
+		{
+			D = C;
+		}
 		void Execute0x52()
 		{
 		}
-		void Execute0x53() => D = E;
-		void Execute0x54() => D = H;
-		void Execute0x55() => D = L;
-		void Execute0x57() => D = A;
-		void Execute0x5F() => E = A;
-		void Execute0x60() => H = B;
-		void Execute0x61() => H = C;
-		void Execute0x62() => H = D;
-		void Execute0x63() => H = E;
+		void Execute0x53()
+		{
+			D = E;
+		}
+		void Execute0x54()
+		{
+			D = H;
+		}
+		void Execute0x55()
+		{
+			D = L;
+		}
+		void Execute0x56()
+		{
+			D = _mmu.ReadByte(HL);
+		}
+		void Execute0x57()
+		{
+			D = A;
+		}
+		void Execute0x58()
+		{
+			E = B;
+		}
+
+
+
+
+
+
+		void Execute0x5F()
+		{
+			E = A;
+		}
+		void Execute0x60()
+		{
+			H = B;
+		}
+		void Execute0x61()
+		{
+			H = C;
+		}
+		void Execute0x62()
+		{
+			H = D;
+		}
+		void Execute0x63()
+		{
+			H = E;
+		}
 		void Execute0x64()
 		{
 		}
-		void Execute0x65() => H = L;
-		void Execute0x66() => H = _mmu.ReadByte(HL);
-		void Execute0x67() => H = A;
-		void Execute0x7C() => A = H;
-		void Execute0x7D() => A = L;
-		void Execute0x77() => _mmu.WriteByte(HL, A);
-		void Execute0x78() => A = B;
-		void Execute0x7B() => A = E;
+		void Execute0x65()
+		{
+			H = L;
+		}
+		void Execute0x66()
+		{
+			H = _mmu.ReadByte(HL);
+		}
+		void Execute0x67()
+		{
+			H = A;
+		}
+		void Execute0x7C()
+		{
+			A = H;
+		}
+		void Execute0x7D()
+		{
+			A = L;
+		}
+		void Execute0x77()
+		{
+			_mmu.WriteByte(HL, A);
+		}
+		void Execute0x78()
+		{
+			A = B;
+		}
+		void Execute0x7B()
+		{
+			A = E;
+		}
 		void Execute0x86()
 		{
 			byte temp = _mmu.ReadByte(HL);
@@ -455,11 +848,26 @@ namespace JMGBE.Core
 			HalfCarryFlag = false;
 			CarryFlag = false;
 		}
-		void Execute0xBE() => CP(_mmu.ReadByte(HL));
-		void Execute0xC1() => BC = POP();
-		void Execute0xC3() => PC = immediate16;
-		void Execute0xC5() => PUSH(BC);
-		void Execute0xC9() => PC = POP();
+		void Execute0xBE()
+		{
+			CP(_mmu.ReadByte(HL));
+		}
+		void Execute0xC1()
+		{
+			BC = POP();
+		}
+		void Execute0xC3()
+		{
+			PC = immediate16;
+		}
+		void Execute0xC5()
+		{
+			PUSH(BC);
+		}
+		void Execute0xC9()
+		{
+			PC = POP();
+		}
 		void Execute0xCB()
 		{
 			byte instruction = _mmu.ReadByte(PC + 1);
@@ -481,22 +889,67 @@ namespace JMGBE.Core
 			ZeroFlag = A == 0;
 			SubtractFlag = true;
 		}
-		void Execute0xE0() => _mmu.WriteByte(0xFF00 + immediate8u, A);
-		void Execute0xE2() => _mmu.WriteByte(0xFF00 + C, A);
-		void Execute0xEA() => _mmu.WriteByte(immediate16, A);
-		void Execute0xF0() => A = _mmu.ReadByte(0xFF00 + immediate8u);
-		void Execute0xF3() => ime = false;
-		void Execute0xFB() => willEnableIme = true;
-		void Execute0xFE() => CP(immediate8u);
+		void Execute0xE0()
+		{
+			_mmu.WriteByte(0xFF00 + immediate8u, A);
+		}
+		void Execute0xE2()
+		{
+			_mmu.WriteByte(0xFF00 + C, A);
+		}
+		void Execute0xEA()
+		{
+			_mmu.WriteByte(immediate16, A);
+		}
+		void Execute0xF0()
+		{
+			A = _mmu.ReadByte(0xFF00 + immediate8u);
+		}
+		void Execute0xF3()
+		{
+			ime = false;
+		}
+		void Execute0xFB()
+		{
+			willEnableIme = true;
+		}
+		void Execute0xFE()
+		{
+			CP(immediate8u);
+		}
 		//Execute CBXX
-		void Execute0xCB11() => RL(ref C);
-		void Execute0xCB17() => RL(ref A);
-		void Execute0xCB3F() => BIT(4, E);
-		void Execute0xCB40() => BIT(0, B);
-		void Execute0xCB50() => BIT(2, B);
-		void Execute0xCB60() => BIT(4, B);
-		void Execute0xCB70() => BIT(6, B);
-		void Execute0xCB7C() => BIT(7, H);
+		void Execute0xCB11()
+		{
+			RL(ref C);
+		}
+		void Execute0xCB17()
+		{
+			RL(ref A);
+		}
+		void Execute0xCB3F()
+		{
+			BIT(4, E);
+		}
+		void Execute0xCB40()
+		{
+			BIT(0, B);
+		}
+		void Execute0xCB50()
+		{
+			BIT(2, B);
+		}
+		void Execute0xCB60()
+		{
+			BIT(4, B);
+		}
+		void Execute0xCB70()
+		{
+			BIT(6, B);
+		}
+		void Execute0xCB7C()
+		{
+			BIT(7, H);
+		}
 		//Helper routines
 		void PUSH(int data)
 		{
