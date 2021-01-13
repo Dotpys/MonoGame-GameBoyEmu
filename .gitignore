@@ -1,6 +1,7 @@
 [Bb]in/
 [Oo]bj/
+[Rr]oms/
+[Ll]ogs/
 .vscode/
 *.bin
-*.gb
-JMGBE.GUI/logs/lastlog.txt
+

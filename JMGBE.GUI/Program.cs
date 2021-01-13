@@ -13,7 +13,7 @@ namespace JMGBE.GUI
         static void Main()
         {
             MMU mmu = new MMU();
-            mmu.LoadRom("Tetris.gb");
+            mmu.LoadRom("roms\\Tetris.gb");
             cpu = new CPU(mmu);
             Thread a = new Thread(ThreadExec);
             a.Start();

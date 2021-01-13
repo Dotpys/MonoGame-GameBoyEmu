@@ -202,12 +202,12 @@ namespace JMGBE.Core
 				{0x56, new Instruction( 8, Execute0x56, FetchNone, "LD D, (HL)")},
 				{0x57, new Instruction( 4, Execute0x57, FetchNone, "LD D, A")},
 				{0x58, new Instruction( 4, Execute0x58, FetchNone, "LD E, B")},
-
-
-
-
-
-
+				{0x59, new Instruction( 4, Execute0x59, FetchNone, "LD E, C")},
+				{0x5A, new Instruction( 4, Execute0x5A, FetchNone, "LD E, D")},
+				{0x5B, new Instruction( 4, Execute0x5B, FetchNone, "LD E, E")},
+				{0x5C, new Instruction( 4, Execute0x5C, FetchNone, "LD E, H")},
+				{0x5D, new Instruction( 4, Execute0x5D, FetchNone, "LD E, L")},
+				{0x5E, new Instruction( 4, Execute0x5E, FetchNone, "LD E, (HL)")},
 				{0x5F, new Instruction( 4, Execute0x5F, FetchNone, "LD E, A")},
 				{0x60, new Instruction( 4, Execute0x60, FetchNone, "LD H, B")},
 				{0x61, new Instruction( 4, Execute0x61, FetchNone, "LD H, C")},
@@ -217,49 +217,95 @@ namespace JMGBE.Core
 				{0x65, new Instruction( 4, Execute0x65, FetchNone, "LD H, L")},
 				{0x66, new Instruction( 8, Execute0x66, FetchNone, "LD H, (HL)")},
 				{0x67, new Instruction( 4, Execute0x67, FetchNone, "LD H, A")},
-				
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+				{0x68, new Instruction( 4, Execute0x68, FetchNone, "LD L, B")},
+				{0x69, new Instruction( 4, Execute0x69, FetchNone, "LD L, C")},
+				{0x6A, new Instruction( 4, Execute0x6A, FetchNone, "LD L, D")},
+				{0x6B, new Instruction( 4, Execute0x6B, FetchNone, "LD L, E")},
+				{0x6C, new Instruction( 4, Execute0x6C, FetchNone, "LD L, H")},
+				{0x6D, new Instruction( 4, Execute0x6D, FetchNone, "LD L, L")},
+				{0x6E, new Instruction( 8, Execute0x6E, FetchNone, "LD L, (HL)")},
+				{0x6F, new Instruction( 4, Execute0x6F, FetchNone, "LD L, A")},
+				{0x70, new Instruction( 8, Execute0x70, FetchNone, "LD (HL), B")},
+				{0x71, new Instruction( 8, Execute0x71, FetchNone, "LD (HL), C")},
+				{0x72, new Instruction( 8, Execute0x72, FetchNone, "LD (HL), D")},
+				{0x73, new Instruction( 8, Execute0x73, FetchNone, "LD (HL), E")},
+				{0x74, new Instruction( 8, Execute0x74, FetchNone, "LD (HL), H")},
+				{0x75, new Instruction( 8, Execute0x75, FetchNone, "LD (HL), L")},
+				{0x76, new Instruction( 4, Execute0x76, FetchNone, "HALT")},
 				{0x77, new Instruction( 8, Execute0x77, FetchNone, "LD (HL), A")},
 				{0x78, new Instruction( 4, Execute0x78, FetchNone, "LD A, B")},
-
-
+				{0x79, new Instruction( 4, Execute0x79, FetchNone, "LD A, C")},
+				{0x7A, new Instruction( 4, Execute0x7A, FetchNone, "LD A, D")},
 				{0x7B, new Instruction( 4, Execute0x7B, FetchNone, "LD A, E")},
 				{0x7C, new Instruction( 4, Execute0x7C, FetchNone, "LD A, H")},
 				{0x7D, new Instruction( 4, Execute0x7D, FetchNone, "LD A, L")},
-				
-				
-
-
-
-
-
-
-				{0x86, new Instruction( 8, Execute0x86, FetchNone, "ADD A, (HL)")},
-				
-
-
-
-
-
-
-
-
+				{0x7E, new Instruction( 8, Execute0x7E, FetchNone, "LD A, (HL)")},
+				{0x7F, new Instruction( 4, Execute0x7F, FetchNone, "LD A, A")},
+				{0x80, new Instruction( 4, Execute0x80, FetchNone, "ADD B")},
+				{0x81, new Instruction( 4, Execute0x81, FetchNone, "ADD C")},
+				{0x82, new Instruction( 4, Execute0x82, FetchNone, "ADD D")},
+				{0x83, new Instruction( 4, Execute0x83, FetchNone, "ADD E")},
+				{0x84, new Instruction( 4, Execute0x84, FetchNone, "ADD H")},
+				{0x85, new Instruction( 4, Execute0x85, FetchNone, "ADD L")},
+				{0x86, new Instruction( 8, Execute0x86, FetchNone, "ADD (HL)")},
+				{0x87, new Instruction( 4, Execute0x87, FetchNone, "ADD A")},
+				{0x88, new Instruction( 4, Execute0x88, FetchNone, "ADC B")},
+				{0x89, new Instruction( 4, Execute0x89, FetchNone, "ADC C")},
+				{0x8A, new Instruction( 4, Execute0x8A, FetchNone, "ADC D")},
+				{0x8B, new Instruction( 4, Execute0x8B, FetchNone, "ADC E")},
+				{0x8C, new Instruction( 4, Execute0x8C, FetchNone, "ADC H")},
+				{0x8D, new Instruction( 4, Execute0x8D, FetchNone, "ADC L")},
+				{0x8E, new Instruction( 8, Execute0x8E, FetchNone, "ADC (HL)")},
+				{0x8F, new Instruction( 4, Execute0x8F, FetchNone, "ADC A")},
 				{0x90, new Instruction( 4, Execute0x90, FetchNone, "SUB B")},
+				{0x91, new Instruction( 4, Execute0x91, FetchNone, "SUB C")},
+				{0x92, new Instruction( 4, Execute0x92, FetchNone, "SUB D")},
+				{0x93, new Instruction( 4, Execute0x93, FetchNone, "SUB E")},
+				{0x94, new Instruction( 4, Execute0x94, FetchNone, "SUB H")},
+				{0x95, new Instruction( 4, Execute0x95, FetchNone, "SUB L")},
+				{0x96, new Instruction( 8, Execute0x96, FetchNone, "SUB (HL)")},
+				{0x97, new Instruction( 4, Execute0x97, FetchNone, "SUB A")},
+				{0x98, new Instruction( 4, Execute0x98, FetchNone, "SBC B")},
+				{0x99, new Instruction( 4, Execute0x99, FetchNone, "SBC C")},
+				{0x9A, new Instruction( 4, Execute0x9A, FetchNone, "SBC D")},
+				{0x9B, new Instruction( 4, Execute0x9B, FetchNone, "SBC E")},
+				{0x9C, new Instruction( 4, Execute0x9C, FetchNone, "SBC H")},
+				{0x9D, new Instruction( 4, Execute0x9D, FetchNone, "SBC L")},
+				{0x9E, new Instruction( 8, Execute0x9E, FetchNone, "SBC (HL)")},
+				{0x9F, new Instruction( 4, Execute0x9F, FetchNone, "SBC A")},
+				{0xA0, new Instruction( 4, Execute0xA0, FetchNone, "AND B")},
+				{0xA1, new Instruction( 4, Execute0xA1, FetchNone, "AND C")},
+				{0xA2, new Instruction( 4, Execute0xA2, FetchNone, "AND D")},
+				{0xA3, new Instruction( 4, Execute0xA3, FetchNone, "AND E")},
+				{0xA4, new Instruction( 4, Execute0xA4, FetchNone, "AND H")},
+				{0xA5, new Instruction( 4, Execute0xA5, FetchNone, "AND L")},
+				{0xA6, new Instruction( 8, Execute0xA6, FetchNone, "AND (HL)")},
+				{0xA7, new Instruction( 4, Execute0xA7, FetchNone, "AND A")},
+				{0xA8, new Instruction( 4, Execute0xA8, FetchNone, "XOR B")},
+				{0xA9, new Instruction( 4, Execute0xA9, FetchNone, "XOR C")},
+				{0xAA, new Instruction( 4, Execute0xAA, FetchNone, "XOR D")},
+				{0xAB, new Instruction( 4, Execute0xAB, FetchNone, "XOR E")},
+				{0xAC, new Instruction( 4, Execute0xAC, FetchNone, "XOR H")},
+				{0xAD, new Instruction( 4, Execute0xAD, FetchNone, "XOR L")},
+				{0xAE, new Instruction( 4, Execute0xAE, FetchNone, "XOR (HL)")},
 				{0xAF, new Instruction( 4, Execute0xAF, FetchNone, "XOR A")},
+				{0xB0, new Instruction( 4, Execute0xB0, FetchNone, "OR B")},
+				{0xB1, new Instruction( 4, Execute0xB1, FetchNone, "OR C")},
+				{0xB2, new Instruction( 4, Execute0xB2, FetchNone, "OR D")},
+				{0xB3, new Instruction( 4, Execute0xB3, FetchNone, "OR E")},
+				{0xB4, new Instruction( 4, Execute0xB4, FetchNone, "OR H")},
+				{0xB5, new Instruction( 4, Execute0xB5, FetchNone, "OR L")},
+				{0xB6, new Instruction( 8, Execute0xB6, FetchNone, "OR (HL)")},
+				{0xB7, new Instruction( 4, Execute0xB7, FetchNone, "OR A")},
+				{0xB8, new Instruction( 4, Execute0xB8, FetchNone, "CP B")},
+				{0xB9, new Instruction( 4, Execute0xB9, FetchNone, "CP C")},
+				{0xBA, new Instruction( 4, Execute0xBA, FetchNone, "CP D")},
+				{0xBB, new Instruction( 4, Execute0xBB, FetchNone, "CP E")},
+				{0xBC, new Instruction( 4, Execute0xBC, FetchNone, "CP H")},
+				{0xBD, new Instruction( 4, Execute0xBD, FetchNone, "CP L")},
 				{0xBE, new Instruction( 8, Execute0xBE, FetchNone, "CP (HL)")},
+				{0xBF, new Instruction( 4, Execute0xBF, FetchNone, "CP A")},
+
 				{0xC1, new Instruction(12, Execute0xC1, FetchNone, "POP BC")},
 				{0xC3, new Instruction(16, Execute0xC3, FetchIm16, "JP 0x{0:X4}")},
 				{0xC5, new Instruction(16, Execute0xC5, FetchNone, "PUSH BC")},
@@ -269,6 +315,7 @@ namespace JMGBE.Core
 				{0xD6, new Instruction( 8, Execute0xD6, FetchIm8U, "SUB 0x{2:X2}")},
 				{0xE0, new Instruction(12, Execute0xE0, FetchIm8U, "LD (0xFF00 + 0x{2:X2}), A")},
 				{0xE2, new Instruction( 8, Execute0xE2, FetchNone, "LD (0xFF00 + C), A")},
+				{0xE6, new Instruction( 8, Execute0xE6, FetchIm8U, "AND 0x{2:X2}")},
 				{0xEA, new Instruction(16, Execute0xEA, FetchIm16, "LD (0x{0:X4}), A")},
 				{0xF0, new Instruction(12, Execute0xF0, FetchIm8U, "LD A, (0xFF00 + 0x{2:X2})")},
 				{0xF3, new Instruction( 4, Execute0xF3, FetchNone, "DI")},
@@ -762,12 +809,29 @@ namespace JMGBE.Core
 		{
 			E = B;
 		}
-
-
-
-
-
-
+		void Execute0x59()
+		{
+			E = C;
+		}
+		void Execute0x5A()
+		{
+			E = D;
+		}
+		void Execute0x5B()
+		{
+		}
+		void Execute0x5C()
+		{
+			E = H;
+		}
+		void Execute0x5D()
+		{
+			E = L;
+		}
+		void Execute0x5E()
+		{
+			E = _mmu.ReadByte(HL);
+		}
 		void Execute0x5F()
 		{
 			E = A;
@@ -803,13 +867,64 @@ namespace JMGBE.Core
 		{
 			H = A;
 		}
-		void Execute0x7C()
+		void Execute0x68()
 		{
-			A = H;
+			L = B;
 		}
-		void Execute0x7D()
+		void Execute0x69()
 		{
-			A = L;
+			L = C;
+		}
+		void Execute0x6A()
+		{
+			L = D;
+		}
+		void Execute0x6B()
+		{
+			L = E;
+		}
+		void Execute0x6C()
+		{
+			L = H;
+		}
+		void Execute0x6D()
+		{
+		}
+		void Execute0x6E()
+		{
+			L = _mmu.ReadByte(HL);
+		}
+		void Execute0x6F()
+		{
+			L = A;
+		}
+		void Execute0x70()
+		{
+			_mmu.WriteByte(HL, B);
+		}
+		void Execute0x71()
+		{
+			_mmu.WriteByte(HL, C);
+		}
+		void Execute0x72()
+		{
+			_mmu.WriteByte(HL, D);
+		}
+		void Execute0x73()
+		{
+			_mmu.WriteByte(HL, E);
+		}
+		void Execute0x74()
+		{
+			_mmu.WriteByte(HL, H);
+		}
+		void Execute0x75()
+		{
+			_mmu.WriteByte(HL, L);
+		}
+		void Execute0x76()
+		{
+			//TODO
 		}
 		void Execute0x77()
 		{
@@ -819,39 +934,290 @@ namespace JMGBE.Core
 		{
 			A = B;
 		}
+		void Execute0x79()
+		{
+			A = C;
+		}
+		void Execute0x7A()
+		{
+			A = D;
+		}
 		void Execute0x7B()
 		{
 			A = E;
 		}
+		void Execute0x7C()
+		{
+			A = H;
+		}
+		void Execute0x7D()
+		{
+			A = L;
+		}
+		void Execute0x7E()
+		{
+			A = _mmu.ReadByte(HL);
+		}
+		void Execute0x7F()
+		{
+		}
+		void Execute0x80()
+		{
+			ADD(B);
+		}
+		void Execute0x81()
+		{
+			ADD(C);
+		}
+		void Execute0x82()
+		{
+			ADD(D);
+		}
+		void Execute0x83()
+		{
+			ADD(E);
+		}
+		void Execute0x84()
+		{
+			ADD(H);
+		}
+		void Execute0x85()
+		{
+			ADD(L);
+		}
 		void Execute0x86()
 		{
-			byte temp = _mmu.ReadByte(HL);
-			HalfCarryFlag = ((A & 0xf) + (temp & 0xf)) == 0x10;
-			CarryFlag = (((short)A) + ((short)temp) & 0x100) != 0;
-			A += temp;
-			ZeroFlag = A == 0;
-			SubtractFlag = false;
+			ADD(_mmu.ReadByte(HL));
+		}
+		void Execute0x87()
+		{
+			ADD(A);
+		}
+		void Execute0x88()
+		{
+			ADC(B);
+		}
+		void Execute0x89()
+		{
+			ADC(C);
+		}
+		void Execute0x8A()
+		{
+			ADC(D);
+		}
+		void Execute0x8B()
+		{
+			ADC(E);
+		}
+		void Execute0x8C()
+		{
+			ADC(H);
+		}
+		void Execute0x8D()
+		{
+			ADC(L);
+		}
+		void Execute0x8E()
+		{
+			ADC(_mmu.ReadByte(HL));
+		}
+		void Execute0x8F()
+		{
+			ADC(A);
 		}
 		void Execute0x90()
 		{
-			HalfCarryFlag = (A & 0xf) > (B & 0xf);
-			CarryFlag = A > B;
-			A -= B;
-			ZeroFlag = A == 0;
-			SubtractFlag = true;
+			SUB(B);
+		}
+		void Execute0x91()
+		{
+			SUB(C);
+		}
+		void Execute0x92()
+		{
+			SUB(D);
+		}
+		void Execute0x93()
+		{
+			SUB(E);
+		}
+		void Execute0x94()
+		{
+			SUB(H);
+		}
+		void Execute0x95()
+		{
+			SUB(L);
+		}
+		void Execute0x96()
+		{
+			SUB(_mmu.ReadByte(HL));
+		}
+		void Execute0x97()
+		{
+			SUB(A);
+		}
+		void Execute0x98()
+		{
+			SBC(B);
+		}
+		void Execute0x99()
+		{
+			SBC(C);
+		}
+		void Execute0x9A()
+		{
+			SBC(D);
+		}
+		void Execute0x9B()
+		{
+			SBC(E);
+		}
+		void Execute0x9C()
+		{
+			SBC(H);
+		}
+		void Execute0x9D()
+		{
+			SBC(L);
+		}
+		void Execute0x9E()
+		{
+			SBC(_mmu.ReadByte(HL));
+		}
+		void Execute0x9F()
+		{
+			SBC(A);
+		}
+		void Execute0xA0()
+		{
+			AND(B);
+		}
+		void Execute0xA1()
+		{
+			AND(C);
+		}
+		void Execute0xA2()
+		{
+			AND(D);
+		}
+		void Execute0xA3()
+		{
+			AND(E);
+		}
+		void Execute0xA4()
+		{
+			AND(H);
+		}
+		void Execute0xA5()
+		{
+			AND(L);
+		}
+		void Execute0xA6()
+		{
+			AND(_mmu.ReadByte(HL));
+		}
+		void Execute0xA7()
+		{
+			AND(A);
+		}
+		void Execute0xA8()
+		{
+			XOR(B);
+		}
+		void Execute0xA9()
+		{
+			XOR(C);
+		}
+		void Execute0xAA()
+		{
+			XOR(D);
+		}
+		void Execute0xAB()
+		{
+			XOR(E);
+		}
+		void Execute0xAC()
+		{
+			XOR(H);
+		}
+		void Execute0xAD()
+		{
+			XOR(L);
+		}
+		void Execute0xAE()
+		{
+			XOR(_mmu.ReadByte(HL));
 		}
 		void Execute0xAF()
 		{
-			A = (byte)(A ^ A);
-			ZeroFlag = A == 0;
-			SubtractFlag = false;
-			HalfCarryFlag = false;
-			CarryFlag = false;
+			XOR(A);
+		}
+		void Execute0xB0()
+		{
+			OR(B);
+		}
+		void Execute0xB1()
+		{
+			OR(C);
+		}
+		void Execute0xB2()
+		{
+			OR(D);
+		}
+		void Execute0xB3()
+		{
+			OR(E);
+		}
+		void Execute0xB4()
+		{
+			OR(H);
+		}
+		void Execute0xB5()
+		{
+			OR(L);
+		}
+		void Execute0xB6()
+		{
+			OR(_mmu.ReadByte(HL));
+		}
+		void Execute0xB7()
+		{
+			OR(A);
+		}
+		void Execute0xB8()
+		{
+			CP(B);
+		}
+		void Execute0xB9()
+		{
+			CP(C);
+		}
+		void Execute0xBA()
+		{
+			CP(D);
+		}
+		void Execute0xBB()
+		{
+			CP(E);
+		}
+		void Execute0xBC()
+		{
+			CP(H);
+		}
+		void Execute0xBD()
+		{
+			CP(L);
 		}
 		void Execute0xBE()
 		{
 			CP(_mmu.ReadByte(HL));
 		}
+		void Execute0xBF()
+		{
+			CP(A);
+		}
+		
 		void Execute0xC1()
 		{
 			BC = POP();
@@ -863,6 +1229,10 @@ namespace JMGBE.Core
 		void Execute0xC5()
 		{
 			PUSH(BC);
+		}
+		void Execute0xC6()
+		{
+			ADD(immediate8u);
 		}
 		void Execute0xC9()
 		{
@@ -881,13 +1251,13 @@ namespace JMGBE.Core
 			PC = immediate16;
 			pci = 0;
 		}
+		void Execute0xCE()
+		{
+			ADC(immediate8u);
+		}
 		void Execute0xD6()
 		{
-			HalfCarryFlag = (A & 0xf) > (immediate8u & 0xf);
-			CarryFlag = A > immediate8u;
-			A -= immediate8u;
-			ZeroFlag = A == 0;
-			SubtractFlag = true;
+			SUB(immediate8u);
 		}
 		void Execute0xE0()
 		{
@@ -896,6 +1266,10 @@ namespace JMGBE.Core
 		void Execute0xE2()
 		{
 			_mmu.WriteByte(0xFF00 + C, A);
+		}
+		void Execute0xE6()
+		{
+			AND(immediate8u);
 		}
 		void Execute0xEA()
 		{
@@ -959,6 +1333,56 @@ namespace JMGBE.Core
 		ushort POP()
 		{
 			return (ushort)(_mmu.ReadByte(SP++) << 8 | _mmu.ReadByte(SP++));
+		}
+		void ADD(byte n)
+		{
+			SubtractFlag = false;
+			HalfCarryFlag = ((A & 0xF) + (n & 0xF)) >= 0x10;
+			CarryFlag = ((short)A + (short)n) >= 0x100;
+			A += n;
+			ZeroFlag = A == 0;
+		}
+		void ADC(byte n)
+		{
+			if (CarryFlag) n += 1;
+			ADD(n);
+		}
+		void SUB(byte n)
+		{
+			SubtractFlag = true;
+			HalfCarryFlag = (A & 0xF) < (n & 0xF);
+			CarryFlag = A < n;
+			A -= n;
+			ZeroFlag = A == 0;
+		}
+		void SBC(byte n)
+		{
+			if (CarryFlag) n += 1;
+			SUB(n);
+		}
+		void AND(byte n)
+		{
+			SubtractFlag = false;
+			HalfCarryFlag = true;
+			CarryFlag = false;
+			A &= n;
+			ZeroFlag = A == 0;
+		}
+		void XOR(byte n)
+		{
+			A ^= n;
+			ZeroFlag = A == 0;
+			SubtractFlag = false;
+			HalfCarryFlag = false;
+			CarryFlag = false;
+		}
+		void OR(byte n)
+		{
+			SubtractFlag = false;
+			HalfCarryFlag = false;
+			CarryFlag = false;
+			A |= n;
+			ZeroFlag = A == 0;
 		}
 		void INC(ref byte register)
 		{
