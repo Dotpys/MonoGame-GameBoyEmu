@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace JMGBE.Core;
@@ -46,9 +47,9 @@ public class MMU
 	public void WriteByte(int addr, byte value)
 	{
 		//The section [0x0000 - 0x7FFF] is ROM.
-		System.Diagnostics.Debug.Assert(addr >= 0x8000 && addr <= 0xFFFF);
+		Debug.Assert(addr >= 0x8000 && addr <= 0xFFFF);
 		//The section [0xFEA0 - 0xFEFF] is not usable.
-		System.Diagnostics.Debug.Assert(!(addr >= 0xFEA0 && addr <= 0xFEFF));
+		Debug.Assert(!(addr >= 0xFEA0 && addr <= 0xFEFF));
 		memory[addr] = value;
 		if (addr >= 0xC000 && addr <= 0xDDFF)
 			memory[addr + 0x2000] = value;

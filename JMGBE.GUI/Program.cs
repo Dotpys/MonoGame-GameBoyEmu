@@ -2,7 +2,7 @@
 using System.Threading;
 using JMGBE.Core;
 
-namespace JMGBE.GUI;
+namespace JMGBE.MonoGame;
 
 public static class Program
 {
@@ -17,7 +17,7 @@ public static class Program
 		Thread a = new Thread(ThreadExec);
 		a.Start();
 
-		using (var game = new GameBoyEmulator(mmu))
+		using (GameBoyEmulator game = new GameBoyEmulator(cpu, mmu))
 			game.Run();
 	}
 

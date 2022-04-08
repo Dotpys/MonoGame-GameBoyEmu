@@ -1,57 +1,54 @@
 ﻿using JMGBE.Core;
+using JMGBE.MonoGame.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace JMGBE.GUI;
+namespace JMGBE.MonoGame;
 
 public class GameBoyEmulator : Game
 {
 	private GraphicsDeviceManager _graphics;
 	//oggetto che disegna le texture a video.
 	private SpriteBatch _spriteBatch;
-	//array di 256 texture che contiene tutte le tile attualmente in vram.
-	private Texture2D[] tile_map;
-	private byte[] background_map;
-	private byte[] tile_colors;
+	private CPU _cpu;
 	private MMU _mmu;
-	private RenderTarget2D dbg_gb_tile_palette;
-	private RenderTarget2D dbg_gb_bg;
-	private RenderTarget2D dbg_gb_display;
+	private GameBoyTilemap _dmgTilemap;
+	private GameBoyBackground _dmgBackground;
+	private GameBoyDisplay _dmgDisplay;
+	private GameBoyBackgroundDisplayOverlay _dmgBackgroundDisplayOverlay;
 
+	private const int DMG_SCREEN_WIDTH = 160;
+	private const int DMG_SCREEN_HEIGHT = 144;
 
-	public GameBoyEmulator(MMU mmu)
+	private SpriteFont debugFont;
+
+	public GameBoyEmulator(CPU cpu, MMU mmu)
 	{
+		_cpu = cpu;
 		_mmu = mmu;
 		_graphics = new GraphicsDeviceManager(this)
 		{
-			PreferredBackBufferWidth = 1774,
-			PreferredBackBufferHeight = 916
+			PreferredBackBufferWidth = 1800,
+			PreferredBackBufferHeight = 1000
 		};
-		Content.RootDirectory = "Content";
+		
 		IsMouseVisible = true;
 	}
 
 	protected override void Initialize()
 	{
-		// TODO: Add your initialization logic here
-		//Inizializzo in memoria 256 texture 8x8 per ogni tile.
-		tile_map = new Texture2D[256];
-		for (int i = 0; i < 256; i++)
-			tile_map[i] = new Texture2D(_graphics.GraphicsDevice, 8, 8, false, SurfaceFormat.Color);
+		_spriteBatch = new SpriteBatch(GraphicsDevice);
+		_dmgTilemap = new GameBoyTilemap(this, _spriteBatch, _mmu);
+		_dmgBackground = new GameBoyBackground(this, _spriteBatch, _mmu, _dmgTilemap);
+		_dmgBackgroundDisplayOverlay = new GameBoyBackgroundDisplayOverlay(this, _spriteBatch, _mmu, true);
 
-		dbg_gb_display = new RenderTarget2D(_graphics.GraphicsDevice, 160, 144);
-		dbg_gb_tile_palette = new RenderTarget2D(_graphics.GraphicsDevice, 128, 128);
-		dbg_gb_bg = new RenderTarget2D(_graphics.GraphicsDevice, 256, 256);
-
-		tile_colors = new byte[16384];
-		background_map = new byte[1024];
-
+		_dmgBackgroundDisplayOverlay.Initialize();
 		base.Initialize();
 	}
 
 	protected override void LoadContent()
 	{
-		_spriteBatch = new SpriteBatch(GraphicsDevice);
+		debugFont = Content.Load<SpriteFont>("DebugFont");
 	}
 
 	private byte[] PaletteToRGBA(byte[] in_arr)
@@ -74,87 +71,6 @@ public class GameBoyEmulator : Game
 
 	protected override void Draw(GameTime gameTime)
 	{
-#region TILEMAP_TEXTURES_GEN
-		// Gestisca la VRAM (TODO: Spostare il tutto in una classe a parte.)
-		int tile_map_addr = _mmu[Registers.LCDC].CheckBit(4) ? 0x8000 : 0x8800;
-		int bakg_map_addr = _mmu[Registers.LCDC].CheckBit(3) ? 0x9C00 : 0x9800;
-		// Crea un array per una tile (formato RGBA)
-		byte[] tile_data = new byte[256];
-		int pixel_index = 0;
-		//Scorrimento Tile per Tile.
-		for (int tile_index = 0; tile_index < 256; tile_index++)
-		{
-			pixel_index = 0;
-			//Scorrimento Riga per Riga.
-			for (int row_index = 0; row_index < 8; row_index++)
-			{
-				//LSB Dei pixel
-				byte loB = _mmu.ReadByte(tile_map_addr + tile_index * 16 + row_index * 2 + 0);
-				//MSB Dei pixel
-				byte hiB = _mmu.ReadByte(tile_map_addr + tile_index * 16 + row_index * 2 + 1);
-				//Scorrimento Pixel per Pixel.
-				for (int k = 7; k >= 0; k--)
-				{
-					if (!hiB.CheckBit(k) && !loB.CheckBit(k))
-					{   //0b00
-						tile_data[pixel_index*4+0] = 0xFF;
-						tile_data[pixel_index*4+1] = 0xFF;
-						tile_data[pixel_index*4+2] = 0xFF;
-						tile_data[pixel_index*4+3] = 0xFF;
-					}
-					else if (!hiB.CheckBit(k) && loB.CheckBit(k))
-					{   //0b01
-						tile_data[pixel_index*4+0] = 0xAA;
-						tile_data[pixel_index*4+1] = 0xAA;
-						tile_data[pixel_index*4+2] = 0xAA;
-						tile_data[pixel_index*4+3] = 0xFF;
-					}
-					else if (hiB.CheckBit(k) && !loB.CheckBit(k))
-					{   //0b10
-						tile_data[pixel_index*4+0] = 0x55;
-						tile_data[pixel_index*4+1] = 0x55;
-						tile_data[pixel_index*4+2] = 0x55;
-						tile_data[pixel_index*4+3] = 0xFF;
-					}
-					else
-					{   //0b11
-						tile_data[pixel_index*4+0] = 0x00;
-						tile_data[pixel_index*4+1] = 0x00;
-						tile_data[pixel_index*4+2] = 0x00;
-						tile_data[pixel_index*4+3] = 0xFF;
-					}
-					pixel_index++;
-				}
-			}
-			//Aggiorna nella 
-			tile_map[tile_index].SetData(tile_data, 0, 256);
-		}
-#endregion
-
-		////////////////////////////////////////////////
-		_spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-		GraphicsDevice.SetRenderTarget(dbg_gb_bg);
-		//////////////////////
-		for (int y = 0; y < 32; y++)
-		{
-			for (int x = 0; x < 32; x++)
-			{
-				_spriteBatch.Draw(tile_map[background_map[y*32+x]], new Rectangle(x * 8, y * 8, 8, 8), Color.White);
-				background_map[32*y+x] = _mmu.ReadByte(bakg_map_addr + 32 * y + x);
-			}
-		}
-		//////////////////////
-		_spriteBatch.End();
-		////////////////////////////////////////////////
-
-
-
-		////////////////////////////////////////////////
-		_spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-		GraphicsDevice.SetRenderTarget(dbg_gb_display);
-		//////////////////////
-		//Display.
-		_spriteBatch.Draw(dbg_gb_bg, new Vector2(0, 0), new Rectangle(_mmu[Registers.SCX], _mmu[Registers.SCY], 160, 144), Color.White);
 		byte stat = 0;
 		_mmu[Registers.LY] = 0;
 		for (int i=0; i<154; i++)
@@ -162,7 +78,7 @@ public class GameBoyEmulator : Game
 			//Per ogni scanline
 			for (int j=0; j<114; j++)
 			{
-
+		
 				stat = _mmu[Registers.STAT];
 				if (j<20)
 				{
@@ -192,31 +108,26 @@ public class GameBoyEmulator : Game
 			}
 			_mmu[Registers.LY]++;
 		}
-		//////////////////////
-		_spriteBatch.End();
-		////////////////////////////////////////////////
 
+		if (_mmu[Registers.LY] == _mmu[Registers.LYC])
+		{
+			/*
+The Game Boy permanently compares the value of the LYC and LY registers.
+When both values are identical, the “LYC=LY” flag in the STAT register is set, and (if enabled) a STAT interrupt is requested.
+			*/
+		}
 
+		_dmgTilemap.Draw(gameTime);
+		_dmgBackground.Draw(gameTime);
 
-		////////////////////////////////////////////////
 		_spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 		GraphicsDevice.SetRenderTarget(null);
-		//////////////////////
-		//Tilemap.
-		for (int y = 0; y < 16; y++)
-		{
-			for (int x = 0; x < 16; x++)
-			{
-				_spriteBatch.Draw(tile_map[16 * y + x], new Rectangle(x * 16 + 2, y * 16 + 2, 16, 16), Color.White);
-			}
-		}
-		//Background
-		_spriteBatch.Draw(dbg_gb_bg, new Rectangle(260, 2, 512, 512), Color.White);
-		//Display
-		_spriteBatch.Draw(dbg_gb_display, new Rectangle(774, 2, 320, 288), Color.White);
-		//////////////////////
+		////////////////////
+		_spriteBatch.Draw(_dmgTilemap.TileMap, new Rectangle(2, 2, 128 * 2, 128 * 2), Color.White);
+		_spriteBatch.Draw(_dmgBackground.Background, new Rectangle(260, 2, 256 * 2, 256 * 2), Color.White);
+		_spriteBatch.Draw(_dmgBackgroundDisplayOverlay.BackgroundDisplayOverlay, new Rectangle(260, 2 + _mmu[Registers.SCY]*2, DMG_SCREEN_WIDTH*2, DMG_SCREEN_HEIGHT*2), Color.White);
 		_spriteBatch.End();
-		////////////////////////////////////////////////
+		//////////////////////////////////////////////
 
 		//Trigghera l'interrupt V-Blank
 		byte oldif = _mmu.ReadByte(0xFF0F);
@@ -233,5 +144,31 @@ public class GameBoyEmulator : Game
 		}
 		_mmu.WriteByte(0xFF0F, oldif);
 		base.Draw(gameTime);
+
+		_spriteBatch.Begin();
+		GraphicsDevice.SetRenderTarget(null);
+		int b = 100;
+		//8 bit registers
+		_spriteBatch.DrawString(debugFont, $"A: (0x{_cpu.A:X2}) {_cpu.A}", new Vector2(2, b + 300), Color.White);
+		_spriteBatch.DrawString(debugFont, $"F: (0x{_cpu.F:X2}) {_cpu.F}", new Vector2(2, b + 320), Color.White);
+		_spriteBatch.DrawString(debugFont, $"B: (0x{_cpu.B:X2}) {_cpu.B}", new Vector2(2, b + 340), Color.White);
+		_spriteBatch.DrawString(debugFont, $"C: (0x{_cpu.C:X2}) {_cpu.C}", new Vector2(2, b + 360), Color.White);
+		_spriteBatch.DrawString(debugFont, $"D: (0x{_cpu.D:X2}) {_cpu.D}", new Vector2(2, b + 380), Color.White);
+		_spriteBatch.DrawString(debugFont, $"E: (0x{_cpu.E:X2}) {_cpu.E}", new Vector2(2, b + 400), Color.White);
+		_spriteBatch.DrawString(debugFont, $"H: (0x{_cpu.H:X2}) {_cpu.H}", new Vector2(2, b + 420), Color.White);
+		_spriteBatch.DrawString(debugFont, $"H: (0x{_cpu.H:X2}) {_cpu.H}", new Vector2(2, b + 440), Color.White);
+
+		//16 bit registers
+		_spriteBatch.DrawString(debugFont, $"BC: (0x{_cpu.BC:X4}) {_cpu.BC}", new Vector2(2, b + 480), Color.White);
+		_spriteBatch.DrawString(debugFont, $"DE: (0x{_cpu.DE:X4}) {_cpu.DE}", new Vector2(2, b + 500), Color.White);
+		_spriteBatch.DrawString(debugFont, $"HL: (0x{_cpu.HL:X4}) {_cpu.HL}", new Vector2(2, b + 520), Color.White);
+
+		//PC e SP
+		_spriteBatch.DrawString(debugFont, $"SP: (0x{_cpu.SP:X4}) {_cpu.SP:X4}", new Vector2(2, b + 560), Color.White);
+		_spriteBatch.DrawString(debugFont, $"PC: (0x{_cpu.PC:X4}) {_cpu.PC:X4}", new Vector2(2, b + 580), Color.White);
+
+		//Current instruction
+		_spriteBatch.DrawString(debugFont, $"{_cpu.PC:X4} (3F)(5E)(C2) PUSH HL", new Vector2(1420, 2), Color.White);
+		_spriteBatch.End();
 	}
 }
