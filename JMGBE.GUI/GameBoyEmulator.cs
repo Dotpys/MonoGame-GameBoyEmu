@@ -7,7 +7,7 @@ namespace JMGBE.MonoGame;
 
 public class GameBoyEmulator : Game
 {
-	private GraphicsDeviceManager _graphics;
+	private readonly GraphicsDeviceManager _graphics;
 	//oggetto che disegna le texture a video.
 	private SpriteBatch _spriteBatch;
 	private CPU _cpu;
